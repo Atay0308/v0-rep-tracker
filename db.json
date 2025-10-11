@@ -1,0 +1,743 @@
+{
+  "workouts": [
+    {
+      "id": "1",
+      "name": "Unterkörper",
+      "date": "2025-01-10",
+      "startTime": "18:00",
+      "endTime": "18:53",
+      "notes": "Gutes Training heute!",
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1",
+          "workoutId": "1",
+          "exerciseName": "Kniebeuge",
+          "muscleGroup": "Beine",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1",
+              "setNumber": 1,
+              "weight": 80,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-2",
+              "setNumber": 2,
+              "weight": 85,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-3",
+              "setNumber": 3,
+              "weight": 85,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-4",
+              "setNumber": 4,
+              "weight": 90,
+              "reps": 8,
+              "breakTime": 90,
+              "notes": "Schwer aber geschafft!"
+            }
+          ]
+        },
+        {
+          "id": "ex-2",
+          "workoutId": "1",
+          "exerciseName": "Beinpresse",
+          "muscleGroup": "Beine",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-5",
+              "setNumber": 1,
+              "weight": 120,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-6",
+              "setNumber": 2,
+              "weight": 140,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-7",
+              "setNumber": 3,
+              "weight": 140,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-3",
+          "workoutId": "1",
+          "exerciseName": "Beinstrecker",
+          "muscleGroup": "Beine",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-8",
+              "setNumber": 1,
+              "weight": 60,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-9",
+              "setNumber": 2,
+              "weight": 65,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-10",
+              "setNumber": 3,
+              "weight": 65,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-4",
+          "workoutId": "1",
+          "exerciseName": "Wadenheben",
+          "muscleGroup": "Beine",
+          "order": 4,
+          "sets": [
+            {
+              "id": "set-11",
+              "setNumber": 1,
+              "weight": 50,
+              "reps": 20,
+              "breakTime": 45,
+              "notes": ""
+            },
+            {
+              "id": "set-12",
+              "setNumber": 2,
+              "weight": 50,
+              "reps": 20,
+              "breakTime": 45,
+              "notes": ""
+            },
+            {
+              "id": "set-13",
+              "setNumber": 3,
+              "weight": 50,
+              "reps": 20,
+              "breakTime": 45,
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Oberkörper",
+      "date": "2025-01-08",
+      "startTime": "17:00",
+      "endTime": "17:50",
+      "notes": "",
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-5",
+          "workoutId": "2",
+          "exerciseName": "Bankdrücken",
+          "muscleGroup": "Brust",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-14",
+              "setNumber": 1,
+              "weight": 70,
+              "reps": 10,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-15",
+              "setNumber": 2,
+              "weight": 75,
+              "reps": 8,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-16",
+              "setNumber": 3,
+              "weight": 75,
+              "reps": 8,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-17",
+              "setNumber": 4,
+              "weight": 80,
+              "reps": 6,
+              "breakTime": 120,
+              "notes": "Neuer PR!"
+            }
+          ]
+        },
+        {
+          "id": "ex-6",
+          "workoutId": "2",
+          "exerciseName": "Schrägbankdrücken",
+          "muscleGroup": "Brust",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-18",
+              "setNumber": 1,
+              "weight": 50,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-19",
+              "setNumber": 2,
+              "weight": 55,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-20",
+              "setNumber": 3,
+              "weight": 55,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-7",
+          "workoutId": "2",
+          "exerciseName": "Schulterdrücken",
+          "muscleGroup": "Schultern",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-21",
+              "setNumber": 1,
+              "weight": 40,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-22",
+              "setNumber": 2,
+              "weight": 45,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-23",
+              "setNumber": 3,
+              "weight": 45,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-8",
+          "workoutId": "2",
+          "exerciseName": "Trizepsdrücken",
+          "muscleGroup": "Trizeps",
+          "order": 4,
+          "sets": [
+            {
+              "id": "set-24",
+              "setNumber": 1,
+              "weight": 30,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-25",
+              "setNumber": 2,
+              "weight": 35,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-26",
+              "setNumber": 3,
+              "weight": 35,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Rücken & Bizeps",
+      "date": "2025-01-06",
+      "startTime": "18:30",
+      "endTime": "19:23",
+      "notes": "Fokus auf Rückenbreite",
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-9",
+          "workoutId": "3",
+          "exerciseName": "Klimmzüge",
+          "muscleGroup": "Rücken",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-27",
+              "setNumber": 1,
+              "weight": 0,
+              "reps": 10,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-28",
+              "setNumber": 2,
+              "weight": 0,
+              "reps": 8,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-29",
+              "setNumber": 3,
+              "weight": 0,
+              "reps": 8,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-30",
+              "setNumber": 4,
+              "weight": 0,
+              "reps": 6,
+              "breakTime": 120,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-10",
+          "workoutId": "3",
+          "exerciseName": "Latziehen",
+          "muscleGroup": "Rücken",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-31",
+              "setNumber": 1,
+              "weight": 60,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-32",
+              "setNumber": 2,
+              "weight": 65,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-33",
+              "setNumber": 3,
+              "weight": 65,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-11",
+          "workoutId": "3",
+          "exerciseName": "Rudern",
+          "muscleGroup": "Rücken",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-34",
+              "setNumber": 1,
+              "weight": 50,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-35",
+              "setNumber": 2,
+              "weight": 55,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-36",
+              "setNumber": 3,
+              "weight": 55,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-12",
+          "workoutId": "3",
+          "exerciseName": "Bizeps Curls",
+          "muscleGroup": "Bizeps",
+          "order": 4,
+          "sets": [
+            {
+              "id": "set-37",
+              "setNumber": 1,
+              "weight": 15,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-38",
+              "setNumber": 2,
+              "weight": 17.5,
+              "reps": 10,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-39",
+              "setNumber": 3,
+              "weight": 17.5,
+              "reps": 10,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-13",
+          "workoutId": "3",
+          "exerciseName": "Hammer Curls",
+          "muscleGroup": "Bizeps",
+          "order": 5,
+          "sets": [
+            {
+              "id": "set-40",
+              "setNumber": 1,
+              "weight": 12.5,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-41",
+              "setNumber": 2,
+              "weight": 15,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-42",
+              "setNumber": 3,
+              "weight": 15,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Push Day",
+      "date": "2025-01-04",
+      "startTime": "16:00",
+      "endTime": "17:15",
+      "notes": "",
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-14",
+          "workoutId": "4",
+          "exerciseName": "Bankdrücken",
+          "muscleGroup": "Brust",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-43",
+              "setNumber": 1,
+              "weight": 65,
+              "reps": 12,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-44",
+              "setNumber": 2,
+              "weight": 70,
+              "reps": 10,
+              "breakTime": 120,
+              "notes": ""
+            },
+            {
+              "id": "set-45",
+              "setNumber": 3,
+              "weight": 75,
+              "reps": 8,
+              "breakTime": 120,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-15",
+          "workoutId": "4",
+          "exerciseName": "Schulterdrücken",
+          "muscleGroup": "Schultern",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-46",
+              "setNumber": 1,
+              "weight": 35,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-47",
+              "setNumber": 2,
+              "weight": 40,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-48",
+              "setNumber": 3,
+              "weight": 40,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-16",
+          "workoutId": "4",
+          "exerciseName": "Seitheben",
+          "muscleGroup": "Schultern",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-49",
+              "setNumber": 1,
+              "weight": 10,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-50",
+              "setNumber": 2,
+              "weight": 12.5,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-51",
+              "setNumber": 3,
+              "weight": 12.5,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-17",
+          "workoutId": "4",
+          "exerciseName": "Trizepsdrücken",
+          "muscleGroup": "Trizeps",
+          "order": 4,
+          "sets": [
+            {
+              "id": "set-52",
+              "setNumber": 1,
+              "weight": 25,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-53",
+              "setNumber": 2,
+              "weight": 30,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-54",
+              "setNumber": 3,
+              "weight": 30,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Leg Day",
+      "date": "2025-01-02",
+      "startTime": "19:00",
+      "endTime": "20:10",
+      "notes": "Sehr intensiv!",
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-18",
+          "workoutId": "5",
+          "exerciseName": "Kniebeuge",
+          "muscleGroup": "Beine",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-55",
+              "setNumber": 1,
+              "weight": 75,
+              "reps": 12,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-56",
+              "setNumber": 2,
+              "weight": 80,
+              "reps": 10,
+              "breakTime": 90,
+              "notes": ""
+            },
+            {
+              "id": "set-57",
+              "setNumber": 3,
+              "weight": 85,
+              "reps": 8,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-19",
+          "workoutId": "5",
+          "exerciseName": "Ausfallschritte",
+          "muscleGroup": "Beine",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-58",
+              "setNumber": 1,
+              "weight": 20,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": "Pro Bein"
+            },
+            {
+              "id": "set-59",
+              "setNumber": 2,
+              "weight": 20,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": "Pro Bein"
+            },
+            {
+              "id": "set-60",
+              "setNumber": 3,
+              "weight": 20,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": "Pro Bein"
+            }
+          ]
+        },
+        {
+          "id": "ex-20",
+          "workoutId": "5",
+          "exerciseName": "Beinbeugen",
+          "muscleGroup": "Beine",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-61",
+              "setNumber": 1,
+              "weight": 45,
+              "reps": 15,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-62",
+              "setNumber": 2,
+              "weight": 50,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            },
+            {
+              "id": "set-63",
+              "setNumber": 3,
+              "weight": 50,
+              "reps": 12,
+              "breakTime": 60,
+              "notes": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
