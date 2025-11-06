@@ -41,7 +41,7 @@ export default function SelectExercisePage({ params }: { params: { id: string } 
             setNumber: 1,
             weight: 0,
             reps: 0,
-            breakTime: 90,
+            breakTime: 0,
             notes: "",
           },
         ],

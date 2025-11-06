@@ -1,20 +1,21 @@
-/**
- * New workout page - creates a new workout and redirects to muscle group selection
- */
-
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { createWorkout } from "@/lib/workout-api"
 
 export default function NewWorkoutPage() {
   const router = useRouter()
+  const hasCreated = useRef(false)
 
   useEffect(() => {
+    if (hasCreated.current) {
+      return
+    }
+
     const initWorkout = async () => {
       try {
-        console.log("[v0] Creating new workout...")
+        hasCreated.current = true
         const now = new Date()
         const workout = await createWorkout({
           name: "",
@@ -26,13 +27,16 @@ export default function NewWorkoutPage() {
           exercises: [],
         })
 
-        console.log("[v0] Workout created with ID:", workout.id)
-        console.log("[v0] Navigating to select-muscle page...")
-        router.push(`/workout/${workout.id}/select-muscle`)
+        if (!workout.id) {
+          throw new Error("Workout ID is missing")
+        }
+
+        router.replace(`/workout/${workout.id}`)
       } catch (error) {
-        console.error("[v0] Failed to create workout:", error)
+        console.error("Failed to create workout:", error)
+        hasCreated.current = false
         alert("Fehler beim Erstellen des Trainings. Bitte versuchen Sie es erneut.")
-        router.push("/")
+        router.replace("/")
       }
     }
 
