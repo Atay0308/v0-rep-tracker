@@ -2,27 +2,30 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Clock, MoreVertical } from "lucide-react"
+import { ArrowLeft, MoreVertical, Trash2 } from "lucide-react"
 import useSWR from "swr"
+import { useSWRConfig } from "swr"
 import { ExerciseCard } from "@/components/exercise-card"
-import { getWorkout, updateWorkout } from "@/lib/workout-api"
+import { getWorkout, updateWorkout, deleteWorkout } from "@/lib/workout-api"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Workout, WorkoutSet } from "@/types/workout"
 import { use } from "react"
 
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const {id : workoutId} = use(params);
+  const { mutate } = useSWRConfig()
 
-  const { data: workout, mutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
+  const { data: workout, mutate: workoutMutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
 
   const [localWorkout, setLocalWorkout] = useState<Workout | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    if (workout) {
+    if (workout && !hasChanges) {
       setLocalWorkout(workout)
     }
-  }, [workout])
+  }, [workout, hasChanges])
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -112,7 +115,20 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     setHasChanges(true)
   }, [])
 
-  const handleAddExercise = () => {
+  const handleAddExercise = async () => {
+    if (!localWorkout) return
+
+    // Save current state before navigating
+    if (hasChanges) {
+      try {
+        await updateWorkout(workoutId, localWorkout)
+        setHasChanges(false)
+        await workoutMutate()
+      } catch (error) {
+        console.error("[v0] Failed to save before adding exercise:", error)
+      }
+    }
+
     router.push(`/workout/${workoutId}/select-muscle`)
   }
 
@@ -122,7 +138,12 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     try {
       await updateWorkout(workoutId, localWorkout)
       setHasChanges(false)
-      mutate()
+      await workoutMutate()
+
+      await mutate("active-workout")
+      await mutate("recent-workouts-3")
+      await mutate("workouts")
+
       alert("Training gespeichert!")
     } catch (error) {
       console.error("[v0] Failed to save workout:", error)
@@ -136,18 +157,40 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     try {
       const now = new Date()
       const endTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`
+      const endDate = now.toISOString().split("T")[0]
 
       await updateWorkout(workoutId, {
         ...localWorkout,
         endTime,
+        endDate,
         isActive: false,
       })
 
       setHasChanges(false)
+
+      await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts"), workoutMutate()])
+
       router.push("/")
     } catch (error) {
       console.error("[v0] Failed to save workout:", error)
       alert("Fehler beim Speichern")
+    }
+  }
+
+  const handleDeleteWorkout = async () => {
+    if (!confirm("Möchtest du dieses Training wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.")) {
+      return
+    }
+
+    try {
+      await deleteWorkout(workoutId)
+
+      await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts")])
+
+      router.replace("/")
+    } catch (error) {
+      console.error("Failed to delete workout:", error)
+      alert("Fehler beim Löschen des Trainings")
     }
   }
 
@@ -175,17 +218,27 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="min-h-screen bg-black text-white pb-24">
       <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <button onClick={handleBack} className="text-blue-500 hover:text-blue-400">
+        <button onClick={handleBack} className="text-blue-500 hover:text-blue-400" aria-label="Zurück">
           <ArrowLeft className="w-6 h-6" />
         </button>
         <h1 className="text-xl font-semibold">{localWorkout.date.split("-").reverse().join(".")}</h1>
         <div className="flex gap-2">
-          <button className="text-blue-500 hover:text-blue-400">
-            <Clock className="w-6 h-6" />
-          </button>
-          <button className="text-blue-500 hover:text-blue-400">
-            <MoreVertical className="w-6 h-6" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-blue-500 hover:text-blue-400" aria-label="Workout Optionen">
+                <MoreVertical className="w-6 h-6" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={handleDeleteWorkout}
+                className="text-red-500 focus:text-red-500 cursor-pointer"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Workout löschen
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
@@ -226,9 +279,12 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
           <div>
             <label className="text-gray-400 text-sm mb-1 block">Endzeit</label>
             <input
-              type="text"
+              type="time"
               value={localWorkout.endTime || ""}
-              readOnly
+              onChange={(e) => {
+                setLocalWorkout((prev) => (prev ? { ...prev, endTime: e.target.value } : prev))
+                setHasChanges(true)
+              }}
               placeholder="--:--"
               className="w-24 px-4 py-2 bg-blue-600 text-white rounded-full text-center"
             />
@@ -271,7 +327,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
         </button>
       </div>
 
-      {localWorkout.isActive ? (
+      {localWorkout.isActive && !localWorkout.endTime ? (
         <div className="px-4 mt-4">
           <button
             onClick={handleSaveAndFinish}

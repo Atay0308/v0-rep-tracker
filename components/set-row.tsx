@@ -52,12 +52,13 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
 
       {/* Weight input - supports decimal values */}
       <input
-        type="text"
-        inputMode="decimal"
+        type="number"
+        min="0"
+        step="0.5"
         value={set.weight || ""}
         onChange={(e) => {
           const value = e.target.value
-          const numValue = value === "" ? 0 : Number.parseFloat(value) || 0
+          const numValue = value === "" ? 0 : Math.max(0, Number.parseFloat(value) || 0)
           onUpdate({ ...set, weight: numValue })
         }}
         className="w-16 px-2 py-1 bg-blue-600 text-white rounded-full text-center text-sm"
@@ -66,12 +67,13 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
 
       {/* Reps input - whole numbers only */}
       <input
-        type="text"
-        inputMode="numeric"
+        type="number"
+        min="0"
+        step="1"
         value={set.reps || ""}
         onChange={(e) => {
           const value = e.target.value
-          const numValue = value === "" ? 0 : Number.parseInt(value) || 0
+          const numValue = value === "" ? 0 : Math.max(0, Number.parseInt(value) || 0)
           onUpdate({ ...set, reps: numValue })
         }}
         className="w-16 px-2 py-1 bg-blue-600 text-white rounded-full text-center text-sm"

@@ -58,4 +58,67 @@ describe("WorkoutCard", () => {
     const link = screen.getByRole("link")
     expect(link).toHaveAttribute("href", "/workout/1")
   })
+
+  it("should not display duration for active workouts", () => {
+    const activeWorkout = { ...mockWorkout, endTime: undefined, isActive: true }
+    render(<WorkoutCard workout={activeWorkout} />)
+    expect(screen.queryByText(/Min/)).not.toBeInTheDocument()
+  })
+
+  it("should truncate long workout names", () => {
+    const longNameWorkout = {
+      ...mockWorkout,
+      name: "This is a very long workout name that should be truncated",
+    }
+    render(<WorkoutCard workout={longNameWorkout} />)
+    const heading = screen.getByRole("heading", { level: 3 })
+    expect(heading).toHaveClass("truncate")
+  })
+
+  it("should show ellipsis for more than 4 exercises", () => {
+    const manyExercisesWorkout = {
+      ...mockWorkout,
+      exercises: [
+        ...mockWorkout.exercises,
+        {
+          id: "ex-3",
+          workoutId: "1",
+          exerciseName: "Schulterdrücken",
+          muscleGroup: "Schultern",
+          order: 3,
+          sets: [{ id: "s4", setNumber: 1, weight: 30, reps: 12, breakTime: 60 }],
+        },
+        {
+          id: "ex-4",
+          workoutId: "1",
+          exerciseName: "Bizeps Curls",
+          muscleGroup: "Bizeps",
+          order: 4,
+          sets: [{ id: "s5", setNumber: 1, weight: 15, reps: 12, breakTime: 60 }],
+        },
+        {
+          id: "ex-5",
+          workoutId: "1",
+          exerciseName: "Trizeps Dips",
+          muscleGroup: "Trizeps",
+          order: 5,
+          sets: [{ id: "s6", setNumber: 1, weight: 0, reps: 15, breakTime: 60 }],
+        },
+      ],
+    }
+    render(<WorkoutCard workout={manyExercisesWorkout} />)
+    expect(screen.getByText(/und 1 weitere/)).toBeInTheDocument()
+  })
+
+  it("should group multiple sets of same exercise", () => {
+    render(<WorkoutCard workout={mockWorkout} />)
+    // Bankdrücken has 2 sets, should show "2x Bankdrücken"
+    expect(screen.getByText(/2x Bankdrücken/)).toBeInTheDocument()
+  })
+
+  it("should have hover effect class", () => {
+    const { container } = render(<WorkoutCard workout={mockWorkout} />)
+    const card = container.querySelector("div")
+    expect(card).toHaveClass("hover:bg-blue-700")
+  })
 })

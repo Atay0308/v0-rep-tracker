@@ -15,7 +15,7 @@
 
 "use client"
 
-import { Plus } from "lucide-react"
+import { Plus, Play } from "lucide-react"
 import Link from "next/link"
 import { WeekCalendar } from "@/components/week-calendar"
 import { WorkoutCard } from "@/components/workout-card"
@@ -47,14 +47,21 @@ export default function HomePage() {
       {/* Start/Continue Workout Button - changes based on active workout status */}
       <div className="px-6 mb-8">
         <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-6">
+          <h2 className="text-2xl font-semibold mb-6 whitespace-pre-line">
             {activeWorkout ? "Training fortsetzen" : "Neues Training\nstarten"}
           </h2>
           <Link
             href={activeWorkout ? `/workout/${activeWorkout.id}` : "/workout/new"}
-            className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-blue-600 hover:bg-blue-700 transition-colors"
+            className={`inline-flex items-center justify-center w-20 h-20 rounded-full transition-colors ${
+              activeWorkout ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            aria-label={activeWorkout ? "Training fortsetzen" : "Neues Training starten"}
           >
-            <Plus className="w-10 h-10 text-white" />
+            {activeWorkout ? (
+              <Play className="w-10 h-10 text-white fill-white" />
+            ) : (
+              <Plus className="w-10 h-10 text-white" />
+            )}
           </Link>
         </div>
       </div>

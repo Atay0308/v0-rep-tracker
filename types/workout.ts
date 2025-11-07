@@ -32,9 +32,10 @@ export interface WorkoutExercise {
 export interface Workout {
   id: string
   name: string
-  date: string // ISO date string
+  date: string // ISO date string (start date)
   startTime: string // HH:mm format
   endTime?: string // HH:mm format
+  endDate?: string // ISO date string (end date, for multi-day workouts)
   notes?: string
   isActive: boolean // true if workout is in progress
   exercises: WorkoutExercise[]
