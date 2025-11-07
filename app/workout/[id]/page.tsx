@@ -7,10 +7,11 @@ import useSWR from "swr"
 import { ExerciseCard } from "@/components/exercise-card"
 import { getWorkout, updateWorkout } from "@/lib/workout-api"
 import type { Workout, WorkoutSet } from "@/types/workout"
+import { use } from "react"
 
-export default function WorkoutPage({ params }: { params: { id: string } }) {
+export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
-  const workoutId = params.id
+  const {id : workoutId} = use(params);
 
   const { data: workout, mutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
 

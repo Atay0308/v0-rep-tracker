@@ -28,6 +28,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s2", setNumber: 2, weight: 85, reps: 8, breakTime: 90 },
           { id: "s3", setNumber: 3, weight: 90, reps: 6, breakTime: 90 },
         ],
+        order: 1,
       },
       {
         id: "e2",
@@ -39,6 +40,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s5", setNumber: 2, weight: 32.5, reps: 10, breakTime: 60 },
           { id: "s6", setNumber: 3, weight: 35, reps: 8, breakTime: 60 },
         ],
+        order: 2,
       },
     ],
   },
@@ -61,6 +63,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s8", setNumber: 2, weight: 110, reps: 8, breakTime: 120 },
           { id: "s9", setNumber: 3, weight: 120, reps: 6, breakTime: 120 },
         ],
+        order: 1,
       },
       {
         id: "e4",
@@ -72,6 +75,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s11", setNumber: 2, weight: 170, reps: 10, breakTime: 90 },
           { id: "s12", setNumber: 3, weight: 190, reps: 8, breakTime: 90 },
         ],
+        order: 2,
       },
     ],
   },
@@ -94,6 +98,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s14", setNumber: 2, weight: 0, reps: 10, breakTime: 90 },
           { id: "s15", setNumber: 3, weight: 0, reps: 8, breakTime: 90 },
         ],
+        order: 1,
       },
       {
         id: "e6",
@@ -105,6 +110,7 @@ const MOCK_WORKOUTS: Workout[] = [
           { id: "s17", setNumber: 2, weight: 17.5, reps: 10, breakTime: 60 },
           { id: "s18", setNumber: 3, weight: 20, reps: 8, breakTime: 60 },
         ],
+        order: 2,
       },
     ],
   },
@@ -142,8 +148,10 @@ function generateId(): string {
  */
 export async function getWorkouts(): Promise<Workout[]> {
   try {
+    console.log("Fetching all workouts")
     const response = await fetch(`${API_BASE_URL}/workouts?_sort=date&_order=desc`)
     if (!response.ok) throw new Error("Failed to fetch workouts")
+    console.log("Fetched all workouts", response)
     return response.json()
   } catch (error) {
     console.log("[v0] Using localStorage fallback for getWorkouts")

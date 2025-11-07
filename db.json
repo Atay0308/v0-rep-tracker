@@ -738,6 +738,130 @@
           ]
         }
       ]
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:40",
+      "notes": "",
+      "isActive": true,
+      "exercises": [
+        {
+          "id": "ex-1760960532950",
+          "workoutId": "6jHRvSr",
+          "exerciseName": "Kniebeuge",
+          "muscleGroup": "Beine",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1760960532950",
+              "setNumber": 1,
+              "weight": 0,
+              "reps": 0,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-1760960589781",
+          "workoutId": "6jHRvSr",
+          "exerciseName": "Bankdrücken",
+          "muscleGroup": "Brust",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-1760960589781",
+              "setNumber": 1,
+              "weight": 0,
+              "reps": 0,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-1760960638584",
+          "workoutId": "6jHRvSr",
+          "exerciseName": "Kabelrudern",
+          "muscleGroup": "Rücken",
+          "order": 3,
+          "sets": [
+            {
+              "id": "set-1760960638584",
+              "setNumber": 1,
+              "weight": 0,
+              "reps": 0,
+              "breakTime": 90,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "6jHRvSr"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:40",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "O5O8Ra2"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "bsGBmNH"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "z1ytMq9"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "-QxJzhz"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "1Vk8ZjO"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "5xKYCBJ"
+    },
+    {
+      "name": "",
+      "date": "2025-10-20",
+      "startTime": "13:41",
+      "notes": "",
+      "isActive": true,
+      "exercises": [],
+      "id": "y6j6DV5"
     }
   ]
 }
