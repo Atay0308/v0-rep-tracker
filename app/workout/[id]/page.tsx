@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, MoreVertical, Lock, Trash2 } from "lucide-react"
+import { ArrowLeft, MoreVertical, Trash2 } from "lucide-react"
 import useSWR from "swr"
+import { useSWRConfig } from "swr"
 import { ExerciseCard } from "@/components/exercise-card"
 import { getWorkout, updateWorkout, deleteWorkout } from "@/lib/workout-api"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -12,8 +13,9 @@ import type { Workout, WorkoutSet } from "@/types/workout"
 export default function WorkoutPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const workoutId = params.id
+  const { mutate } = useSWRConfig()
 
-  const { data: workout, mutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
+  const { data: workout, mutate: workoutMutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
 
   const [localWorkout, setLocalWorkout] = useState<Workout | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
@@ -120,7 +122,7 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
       try {
         await updateWorkout(workoutId, localWorkout)
         setHasChanges(false)
-        await mutate()
+        await workoutMutate()
       } catch (error) {
         console.error("[v0] Failed to save before adding exercise:", error)
       }
@@ -133,16 +135,14 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
     if (!localWorkout || !hasChanges) return
 
     try {
-      const updateData = { ...localWorkout }
-      // If workout already has an endTime, preserve it (don't allow changes)
-      if (workout?.endTime) {
-        updateData.endTime = workout.endTime
-        updateData.isActive = false
-      }
-
-      await updateWorkout(workoutId, updateData)
+      await updateWorkout(workoutId, localWorkout)
       setHasChanges(false)
-      mutate()
+      await workoutMutate()
+
+      await mutate("active-workout")
+      await mutate("recent-workouts-3")
+      await mutate("workouts")
+
       alert("Training gespeichert!")
     } catch (error) {
       console.error("[v0] Failed to save workout:", error)
@@ -153,22 +153,22 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
   const handleSaveAndFinish = async () => {
     if (!localWorkout) return
 
-    if (localWorkout.endTime) {
-      alert("Dieses Training wurde bereits beendet.")
-      return
-    }
-
     try {
       const now = new Date()
       const endTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`
+      const endDate = now.toISOString().split("T")[0]
 
       await updateWorkout(workoutId, {
         ...localWorkout,
         endTime,
+        endDate,
         isActive: false,
       })
 
       setHasChanges(false)
+
+      await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts"), workoutMutate()])
+
       router.push("/")
     } catch (error) {
       console.error("[v0] Failed to save workout:", error)
@@ -183,6 +183,9 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
 
     try {
       await deleteWorkout(workoutId)
+
+      await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts")])
+
       router.replace("/")
     } catch (error) {
       console.error("Failed to delete workout:", error)
@@ -273,19 +276,16 @@ export default function WorkoutPage({ params }: { params: { id: string } }) {
             />
           </div>
           <div>
-            <label className="text-gray-400 text-sm mb-1 block flex items-center gap-1">
-              Endzeit
-              {localWorkout.endTime && <Lock className="w-3 h-3" />}
-            </label>
+            <label className="text-gray-400 text-sm mb-1 block">Endzeit</label>
             <input
-              type="text"
+              type="time"
               value={localWorkout.endTime || ""}
-              readOnly
+              onChange={(e) => {
+                setLocalWorkout((prev) => (prev ? { ...prev, endTime: e.target.value } : prev))
+                setHasChanges(true)
+              }}
               placeholder="--:--"
-              className={`w-24 px-4 py-2 text-white rounded-full text-center ${
-                localWorkout.endTime ? "bg-gray-700" : "bg-blue-600"
-              }`}
-              title={localWorkout.endTime ? "Endzeit kann nicht mehr geändert werden" : "Wird beim Beenden gesetzt"}
+              className="w-24 px-4 py-2 bg-blue-600 text-white rounded-full text-center"
             />
           </div>
         </div>

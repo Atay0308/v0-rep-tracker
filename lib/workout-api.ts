@@ -13,6 +13,7 @@ const MOCK_WORKOUTS: Workout[] = [
     id: "1",
     name: "Oberkörper",
     date: "2025-01-08",
+    endDate: "2025-01-08",
     startTime: "10:00",
     endTime: "11:30",
     notes: "Gutes Training heute",
@@ -46,6 +47,7 @@ const MOCK_WORKOUTS: Workout[] = [
     id: "2",
     name: "Unterkörper",
     date: "2025-01-06",
+    endDate: "2025-01-06",
     startTime: "14:00",
     endTime: "15:45",
     notes: "",
@@ -79,6 +81,7 @@ const MOCK_WORKOUTS: Workout[] = [
     id: "3",
     name: "Rücken & Bizeps",
     date: "2025-01-04",
+    endDate: "2025-01-04",
     startTime: "09:00",
     endTime: "10:30",
     notes: "Fokus auf Form",
@@ -259,7 +262,11 @@ export async function getRecentWorkouts(limit = 3): Promise<Workout[]> {
     const workouts = getLocalWorkouts()
     return workouts
       .filter((w) => !w.isActive)
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .sort((a, b) => {
+        const dateA = new Date(a.date + "T" + (a.endTime || a.startTime))
+        const dateB = new Date(b.date + "T" + (b.endTime || b.startTime))
+        return dateB.getTime() - dateA.getTime()
+      })
       .slice(0, limit)
   }
 }

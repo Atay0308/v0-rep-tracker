@@ -15,11 +15,13 @@ export default function NewWorkoutPage() {
 
     const initWorkout = async () => {
       try {
+        console.log("[v0] Creating new workout...")
         hasCreated.current = true
         const now = new Date()
         const workout = await createWorkout({
           name: "",
           date: now.toISOString().split("T")[0],
+          endDate: undefined,
           startTime: `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`,
           endTime: undefined,
           notes: "",
@@ -27,13 +29,16 @@ export default function NewWorkoutPage() {
           exercises: [],
         })
 
+        console.log("[v0] Workout created:", workout)
+
         if (!workout.id) {
           throw new Error("Workout ID is missing")
         }
 
+        console.log("[v0] Navigating to workout:", workout.id)
         router.replace(`/workout/${workout.id}`)
       } catch (error) {
-        console.error("Failed to create workout:", error)
+        console.error("[v0] Failed to create workout:", error)
         hasCreated.current = false
         alert("Fehler beim Erstellen des Trainings. Bitte versuchen Sie es erneut.")
         router.replace("/")
