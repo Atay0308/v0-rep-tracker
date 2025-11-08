@@ -4,17 +4,17 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Search, Plus, MoreVertical, X } from "lucide-react"
 import { getExercisesByMuscleGroup, addCustomExercise } from "@/lib/exercises-data"
 import { updateWorkout, getWorkout } from "@/lib/workout-api"
 import type { MuscleGroup, WorkoutExercise } from "@/types/workout"
 
-export default function SelectExercisePage({ params }: { params: { id: string } }) {
+export default function SelectExercisePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const workoutId = params.id
+  const { id: workoutId } = use(params)
   const muscleGroup = searchParams.get("muscle") as MuscleGroup
 
   const [searchQuery, setSearchQuery] = useState("")

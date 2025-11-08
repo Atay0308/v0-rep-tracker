@@ -8,116 +8,7 @@ const API_BASE_URL = "http://localhost:3001"
 const STORAGE_KEY = "workout-tracker-data"
 const INIT_KEY = "workout-tracker-initialized"
 
-const MOCK_WORKOUTS: Workout[] = [
-  {
-    id: "1",
-    name: "Oberkörper",
-    date: "2025-01-08",
-    endDate: "2025-01-08",
-    startTime: "10:00",
-    endTime: "11:30",
-    notes: "Gutes Training heute",
-    isActive: false,
-    exercises: [
-      {
-        id: "e1",
-        workoutId: "1",
-        exerciseName: "Bankdrücken",
-        muscleGroup: "Brust",
-        sets: [
-          { id: "s1", setNumber: 1, weight: 80, reps: 10, breakTime: 90 },
-          { id: "s2", setNumber: 2, weight: 85, reps: 8, breakTime: 90 },
-          { id: "s3", setNumber: 3, weight: 90, reps: 6, breakTime: 90 },
-        ],
-        order: 1,
-      },
-      {
-        id: "e2",
-        workoutId: "1",
-        exerciseName: "Schulterdrücken",
-        muscleGroup: "Schultern",
-        sets: [
-          { id: "s4", setNumber: 1, weight: 30, reps: 12, breakTime: 60 },
-          { id: "s5", setNumber: 2, weight: 32.5, reps: 10, breakTime: 60 },
-          { id: "s6", setNumber: 3, weight: 35, reps: 8, breakTime: 60 },
-        ],
-        order: 2,
-      },
-    ],
-  },
-  {
-    id: "2",
-    name: "Unterkörper",
-    date: "2025-01-06",
-    endDate: "2025-01-06",
-    startTime: "14:00",
-    endTime: "15:45",
-    notes: "",
-    isActive: false,
-    exercises: [
-      {
-        id: "e3",
-        workoutId: "2",
-        exerciseName: "Kniebeuge",
-        muscleGroup: "Beine",
-        sets: [
-          { id: "s7", setNumber: 1, weight: 100, reps: 10, breakTime: 120 },
-          { id: "s8", setNumber: 2, weight: 110, reps: 8, breakTime: 120 },
-          { id: "s9", setNumber: 3, weight: 120, reps: 6, breakTime: 120 },
-        ],
-        order: 1,
-      },
-      {
-        id: "e4",
-        workoutId: "2",
-        exerciseName: "Beinpresse",
-        muscleGroup: "Beine",
-        sets: [
-          { id: "s10", setNumber: 1, weight: 150, reps: 12, breakTime: 90 },
-          { id: "s11", setNumber: 2, weight: 170, reps: 10, breakTime: 90 },
-          { id: "s12", setNumber: 3, weight: 190, reps: 8, breakTime: 90 },
-        ],
-        order: 2,
-      },
-    ],
-  },
-  {
-    id: "3",
-    name: "Rücken & Bizeps",
-    date: "2025-01-04",
-    endDate: "2025-01-04",
-    startTime: "09:00",
-    endTime: "10:30",
-    notes: "Fokus auf Form",
-    isActive: false,
-    exercises: [
-      {
-        id: "e5",
-        workoutId: "3",
-        exerciseName: "Klimmzüge",
-        muscleGroup: "Rücken",
-        sets: [
-          { id: "s13", setNumber: 1, weight: 0, reps: 12, breakTime: 90 },
-          { id: "s14", setNumber: 2, weight: 0, reps: 10, breakTime: 90 },
-          { id: "s15", setNumber: 3, weight: 0, reps: 8, breakTime: 90 },
-        ],
-        order: 1,
-      },
-      {
-        id: "e6",
-        workoutId: "3",
-        exerciseName: "Bizeps Curls",
-        muscleGroup: "Bizeps",
-        sets: [
-          { id: "s16", setNumber: 1, weight: 15, reps: 12, breakTime: 60 },
-          { id: "s17", setNumber: 2, weight: 17.5, reps: 10, breakTime: 60 },
-          { id: "s18", setNumber: 3, weight: 20, reps: 8, breakTime: 60 },
-        ],
-        order: 2,
-      },
-    ],
-  },
-]
+
 
 function initializeLocalStorage(): void {
   if (typeof window === "undefined") return
@@ -125,7 +16,7 @@ function initializeLocalStorage(): void {
   const isInitialized = localStorage.getItem(INIT_KEY)
   if (!isInitialized) {
     console.log("[v0] Initializing localStorage with mock data")
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(MOCK_WORKOUTS))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([]))
     localStorage.setItem(INIT_KEY, "true")
   }
 }
@@ -183,6 +74,12 @@ export async function getWorkout(id: string): Promise<Workout> {
  * Create a new workout
  */
 export async function createWorkout(workout: Omit<Workout, "id">): Promise<Workout> {
+  const existingActive = await getActiveWorkout()
+  if (existingActive) {
+    console.log("[v0] Active workout already exists, returning existing workout")
+    return existingActive
+  }
+  // Zuerst bei Datenbank versuchen
   try {
     const response = await fetch(`${API_BASE_URL}/workouts`, {
       method: "POST",
@@ -192,11 +89,15 @@ export async function createWorkout(workout: Omit<Workout, "id">): Promise<Worko
     if (!response.ok) throw new Error("Failed to create workout")
     return response.json()
   } catch (error) {
+    // Fallback: localStorage
     console.log("[v0] Using localStorage fallback for createWorkout")
+
     const workouts = getLocalWorkouts()
     const newWorkout = { ...workout, id: generateId() }
+    
     workouts.push(newWorkout)
     saveLocalWorkouts(workouts)
+    
     return newWorkout
   }
 }
@@ -206,20 +107,60 @@ export async function createWorkout(workout: Omit<Workout, "id">): Promise<Worko
  */
 export async function updateWorkout(id: string, workout: Partial<Workout>): Promise<Workout> {
   try {
+    console.log("[v0] Versuche JSON Server zu erreichen...")
     const response = await fetch(`${API_BASE_URL}/workouts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(workout),
     })
-    if (!response.ok) throw new Error("Failed to update workout")
-    return response.json()
+    console.log("[v0] JSON Server Response Status:", response.status)
+    
+    if (!response.ok) {
+
+      throw new Error("Failed to update workout")
+    }
+    
+    const result = await response.json()
+    return result
   } catch (error) {
-    console.log("[v0] Using localStorage fallback for updateWorkout")
+
     const workouts = getLocalWorkouts()
+    console.log("[v0] Anzahl Workouts im localStorage:", workouts.length)
+    
     const index = workouts.findIndex((w) => w.id === id)
-    if (index === -1) throw new Error("Workout not found")
+    console.log("[v0] Workout Index gefunden:", index)
+    
+    if (index === -1) {
+      console.error("[v0] FEHLER: Workout nicht gefunden!")
+      throw new Error("Workout not found")
+    }
+    
+    console.log("[v0] Vor dem Speichern:")
+    console.log("[v0]   Altes Workout:", JSON.stringify(workouts[index], null, 2))
+    console.log("[v0]   Altes isActive:", workouts[index].isActive)
+    console.log("[v0]   Update-Daten:", JSON.stringify(workout, null, 2))
+    console.log("[v0]   Update isActive:", workout.isActive)
+    
     workouts[index] = { ...workouts[index], ...workout }
+    
+    console.log("[v0] Nach dem Merge:")
+    console.log("[v0]   Neues Workout:", JSON.stringify(workouts[index], null, 2))
+    console.log("[v0]   Neues isActive:", workouts[index].isActive)
+    
     saveLocalWorkouts(workouts)
+    console.log("[v0] localStorage gespeichert")
+    
+    // Verifiziere das Speichern
+    const verify = getLocalWorkouts()
+    const verified = verify.find((w) => w.id === id)
+    console.log("[v0] Verifizierung:")
+    console.log("[v0]   Workout gefunden:", verified ? "JA" : "NEIN")
+    if (verified) {
+      console.log("[v0]   Verifiziertes isActive:", verified.isActive)
+      console.log("[v0]   Verifiziertes Workout:", JSON.stringify(verified, null, 2))
+    }
+    
+    console.log("[v0] ====== updateWorkout ENDE (localStorage) =====")
     return workouts[index]
   }
 }
@@ -253,7 +194,14 @@ export async function getActiveWorkout(): Promise<Workout | null> {
   } catch (error) {
     console.log("[v0] Using localStorage fallback for getActiveWorkout")
     const workouts = getLocalWorkouts()
-    return workouts.find((w) => w.isActive) || null
+
+    console.log("[v0] DEBUG getActiveWorkout:")
+    console.log("[v0]   Anzahl Workouts:", workouts.length)
+    
+    const active = workouts.find((w) => w.isActive)
+    console.log("[v0]   Aktives Workout gefunden:", active ? "JA" : "NEIN")
+
+    return active || null
   }
 }
 
@@ -262,18 +210,55 @@ export async function getActiveWorkout(): Promise<Workout | null> {
  */
 export async function getRecentWorkouts(limit = 3): Promise<Workout[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/workouts?_sort=date&_order=desc&_limit=${limit}&isActive=false`)
+    const response = await fetch(`${API_BASE_URL}/workouts?isActive=false`)
     if (!response.ok) throw new Error("Failed to fetch recent workouts")
-    return response.json()
+    const workouts = await response.json()
+    
+    // Sortiere nach Endzeitpunkt (oder Startzeitpunkt) - neueste zuerst
+    const sorted = workouts.sort((a: Workout, b: Workout) => {
+      // Verwende endTime wenn vorhanden, sonst startTime
+      const timeA = a.endTime || a.startTime
+      const timeB = b.endTime || b.startTime
+      
+      // Erstelle Datum+Zeit Objekte für korrekten Vergleich
+      const dateTimeA = new Date(a.date + "T" + timeA + ":00")
+      const dateTimeB = new Date(b.date + "T" + timeB + ":00")
+      
+      // Sortiere absteigend (neueste zuerst)
+      const timeDiff = dateTimeB.getTime() - dateTimeA.getTime()
+      
+      // Wenn gleiche Zeit, sortiere nach ID (als Fallback)
+      if (timeDiff === 0) {
+        return b.id.localeCompare(a.id)
+      }
+      
+      return timeDiff
+    })
+    
+    return sorted.slice(0, limit)
   } catch (error) {
     console.log("[v0] Using localStorage fallback for getRecentWorkouts")
     const workouts = getLocalWorkouts()
     return workouts
       .filter((w) => !w.isActive)
       .sort((a, b) => {
-        const dateA = new Date(a.date + "T" + (a.endTime || a.startTime))
-        const dateB = new Date(b.date + "T" + (b.endTime || b.startTime))
-        return dateB.getTime() - dateA.getTime()
+        // Verwende endTime wenn vorhanden, sonst startTime
+        const timeA = a.endTime || a.startTime
+        const timeB = b.endTime || b.startTime
+        
+        // Erstelle Datum+Zeit Objekte für korrekten Vergleich
+        const dateTimeA = new Date(a.date + "T" + timeA + ":00")
+        const dateTimeB = new Date(b.date + "T" + timeB + ":00")
+        
+        // Sortiere absteigend (neueste zuerst)
+        const timeDiff = dateTimeB.getTime() - dateTimeA.getTime()
+        
+        // Wenn gleiche Zeit, sortiere nach ID (als Fallback)
+        if (timeDiff === 0) {
+          return b.id.localeCompare(a.id)
+        }
+        
+        return timeDiff
       })
       .slice(0, limit)
   }

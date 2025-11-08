@@ -97,6 +97,7 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
         <button
           onClick={() => setShowMenu(!showMenu)}
           className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
+          data-testid="set-menu-button"
         >
           <MoreVertical className="w-4 h-4" />
         </button>
@@ -105,6 +106,7 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
             <button
               onClick={handleDelete}
               className="w-full flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-700 rounded-lg"
+              data-testid="set-delete-button"
             >
               <Trash2 className="w-4 h-4" />
               Löschen

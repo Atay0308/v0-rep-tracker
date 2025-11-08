@@ -101,7 +101,8 @@ export function calculateMuscleGroupVolume(
       .reduce((sum, ex) => sum + ex.sets.length, 0)
 
     // Add to grouped data
-    grouped.set(key, (grouped.get(key) || 0) + volume)
+    if (volume > 0)
+      grouped.set(key, (grouped.get(key) || 0) + volume)
   })
 
   // Convert map to array and sort by date

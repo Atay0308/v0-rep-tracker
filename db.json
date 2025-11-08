@@ -740,128 +740,349 @@
       ]
     },
     {
-      "name": "",
+      "name": "Brust",
       "date": "2025-10-20",
-      "startTime": "13:40",
+      "startTime": "13:41",
       "notes": "",
-      "isActive": true,
+      "isActive": false,
       "exercises": [
         {
-          "id": "ex-1760960532950",
-          "workoutId": "6jHRvSr",
-          "exerciseName": "Kniebeuge",
-          "muscleGroup": "Beine",
+          "id": "ex-1762477321384",
+          "workoutId": "y6j6DV5",
+          "exerciseName": "Bankdrücken",
+          "muscleGroup": "Brust",
           "order": 1,
           "sets": [
             {
-              "id": "set-1760960532950",
+              "id": "set-1762477321384",
               "setNumber": 1,
-              "weight": 0,
-              "reps": 0,
-              "breakTime": 90,
+              "weight": 80,
+              "reps": 12,
+              "breakTime": 0,
               "notes": ""
-            }
-          ]
-        },
-        {
-          "id": "ex-1760960589781",
-          "workoutId": "6jHRvSr",
-          "exerciseName": "Bankdrücken",
-          "muscleGroup": "Brust",
-          "order": 2,
-          "sets": [
+            },
             {
-              "id": "set-1760960589781",
-              "setNumber": 1,
-              "weight": 0,
-              "reps": 0,
-              "breakTime": 90,
-              "notes": ""
-            }
-          ]
-        },
-        {
-          "id": "ex-1760960638584",
-          "workoutId": "6jHRvSr",
-          "exerciseName": "Kabelrudern",
-          "muscleGroup": "Rücken",
-          "order": 3,
-          "sets": [
-            {
-              "id": "set-1760960638584",
-              "setNumber": 1,
-              "weight": 0,
-              "reps": 0,
-              "breakTime": 90,
+              "id": "set-1762477330126",
+              "setNumber": 2,
+              "weight": 150,
+              "reps": 3,
+              "breakTime": 0,
               "notes": ""
             }
           ]
         }
       ],
-      "id": "6jHRvSr"
+      "id": "y6j6DV5",
+      "endTime": "14:54",
+      "endDate": "2025-11-07"
     },
     {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:40",
+      "name": "Brust",
+      "date": "2025-11-07",
+      "startTime": "02:02",
       "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "O5O8Ra2"
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1762477365604",
+          "workoutId": "EvXaRTM",
+          "exerciseName": "Bankdrücken",
+          "muscleGroup": "Brust",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1762477365604",
+              "setNumber": 1,
+              "weight": 100,
+              "reps": 8,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762477371888",
+              "setNumber": 2,
+              "weight": 120,
+              "reps": 8,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762477378259",
+              "setNumber": 3,
+              "weight": 180,
+              "reps": 4,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "EvXaRTM",
+      "endTime": "02:37",
+      "endDate": "2025-11-07"
     },
     {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
+      "name": "Ganzkörper",
+      "date": "2025-11-07",
+      "startTime": "02:40",
       "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "bsGBmNH"
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1762479663260",
+          "workoutId": "dYJB3SP",
+          "exerciseName": "Kreuzheben",
+          "muscleGroup": "Rücken",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1762479663260",
+              "setNumber": 1,
+              "weight": 120,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762479671246",
+              "setNumber": 2,
+              "weight": 140,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762479678318",
+              "setNumber": 3,
+              "weight": 160,
+              "reps": 4,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-1762479700052",
+          "workoutId": "dYJB3SP",
+          "exerciseName": "Kniebeuge",
+          "muscleGroup": "Beine",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-1762479700052",
+              "setNumber": 1,
+              "weight": 100,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762479708732",
+              "setNumber": 2,
+              "weight": 110,
+              "reps": 8,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762479717709",
+              "setNumber": 3,
+              "weight": 120,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "dYJB3SP",
+      "endTime": "02:42",
+      "endDate": "2025-11-07"
     },
     {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
+      "name": "Beine",
+      "date": "2025-11-07",
+      "startTime": "23:43",
       "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "z1ytMq9"
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1762564823149",
+          "workoutId": "Tj0dy-2",
+          "exerciseName": "Kniebeuge Einbeinig",
+          "muscleGroup": "Beine",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1762564823149",
+              "setNumber": 1,
+              "weight": 50,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762564848663",
+              "setNumber": 2,
+              "weight": 50,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-1762564845953",
+          "workoutId": "Tj0dy-2",
+          "exerciseName": "Kniebeuge",
+          "muscleGroup": "Beine",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-1762564845953",
+              "setNumber": 1,
+              "weight": 125,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762564852373",
+              "setNumber": 2,
+              "weight": 155,
+              "reps": 4,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "Tj0dy-2",
+      "endTime": "02:21",
+      "endDate": "2025-11-08"
     },
     {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
+      "name": "Arme",
+      "date": "2025-11-08",
+      "startTime": "18:11",
       "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "-QxJzhz"
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1762621895709",
+          "workoutId": "KAswx5X",
+          "exerciseName": "Trizepsdrücken",
+          "muscleGroup": "Trizeps",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1762621895709",
+              "setNumber": 1,
+              "weight": 70,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762621905634",
+              "setNumber": 2,
+              "weight": 75,
+              "reps": 10,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762621906345",
+              "setNumber": 3,
+              "weight": 80,
+              "reps": 8,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        },
+        {
+          "id": "ex-1762621930027",
+          "workoutId": "KAswx5X",
+          "exerciseName": "Hammer Curls",
+          "muscleGroup": "Bizeps",
+          "order": 2,
+          "sets": [
+            {
+              "id": "set-1762621930027",
+              "setNumber": 1,
+              "weight": 20,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762621937379",
+              "setNumber": 2,
+              "weight": 20,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762621938203",
+              "setNumber": 3,
+              "weight": 20,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "KAswx5X",
+      "endTime": "18:12",
+      "endDate": "2025-11-08"
     },
     {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
+      "name": "Rücken",
+      "date": "2025-11-08",
+      "startTime": "18:12",
       "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "1Vk8ZjO"
-    },
-    {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
-      "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "5xKYCBJ"
-    },
-    {
-      "name": "",
-      "date": "2025-10-20",
-      "startTime": "13:41",
-      "notes": "",
-      "isActive": true,
-      "exercises": [],
-      "id": "y6j6DV5"
+      "isActive": false,
+      "exercises": [
+        {
+          "id": "ex-1762622074169",
+          "workoutId": "eFpp_Sd",
+          "exerciseName": "Kreuzheben",
+          "muscleGroup": "Rücken",
+          "order": 1,
+          "sets": [
+            {
+              "id": "set-1762622074169",
+              "setNumber": 1,
+              "weight": 150,
+              "reps": 8,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762622080618",
+              "setNumber": 2,
+              "weight": 175,
+              "reps": 6,
+              "breakTime": 0,
+              "notes": ""
+            },
+            {
+              "id": "set-1762622085163",
+              "setNumber": 3,
+              "weight": 200,
+              "reps": 3,
+              "breakTime": 0,
+              "notes": ""
+            }
+          ]
+        }
+      ],
+      "id": "eFpp_Sd",
+      "endTime": "18:14",
+      "endDate": "2025-11-08"
     }
   ]
 }

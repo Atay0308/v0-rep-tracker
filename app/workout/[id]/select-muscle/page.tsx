@@ -4,14 +4,15 @@
 
 "use client"
 
+import { use } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Search } from "lucide-react"
 import { MUSCLE_GROUPS } from "@/lib/exercises-data"
 import type { MuscleGroup } from "@/types/workout"
 
-export default function SelectMusclePage({ params }: { params: { id: string } }) {
+export default function SelectMusclePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
-  const workoutId = params.id
+  const { id: workoutId } = use(params)
 
   const handleMuscleSelect = (muscleGroup: MuscleGroup) => {
     router.push(`/workout/${workoutId}/select-exercise?muscle=${muscleGroup}`)

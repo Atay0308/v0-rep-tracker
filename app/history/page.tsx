@@ -15,9 +15,23 @@ export default function HistoryPage() {
     workouts
       ?.filter((w) => !w.isActive)
       .sort((a, b) => {
-        const dateA = new Date(a.date + " " + (a.startTime || "00:00"))
-        const dateB = new Date(b.date + " " + (b.startTime || "00:00"))
-        return dateB.getTime() - dateA.getTime()
+        // Verwende endTime wenn vorhanden, sonst startTime
+        const timeA = a.endTime || a.startTime
+        const timeB = b.endTime || b.startTime
+        
+        // Erstelle Datum+Zeit Objekte für korrekten Vergleich
+        const dateTimeA = new Date(a.date + "T" + timeA + ":00")
+        const dateTimeB = new Date(b.date + "T" + timeB + ":00")
+        
+        // Sortiere absteigend (neueste zuerst)
+        const timeDiff = dateTimeB.getTime() - dateTimeA.getTime()
+        
+        // Wenn gleiche Zeit, sortiere nach ID (als Fallback)
+        if (timeDiff === 0) {
+          return b.id.localeCompare(a.id)
+        }
+        
+        return timeDiff
       }) || []
 
   return (
