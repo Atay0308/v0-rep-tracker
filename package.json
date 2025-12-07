@@ -66,6 +66,7 @@
     "vaul": "latest"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.0.1",
     "@tailwindcss/postcss": "^4.1.14",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.1.0",
@@ -83,8 +84,4 @@
     "tailwindcss": "^4.1.14",
     "typescript": "^5"
   }
-
 }
-
-
-

@@ -107,60 +107,29 @@ export async function createWorkout(workout: Omit<Workout, "id">): Promise<Worko
  */
 export async function updateWorkout(id: string, workout: Partial<Workout>): Promise<Workout> {
   try {
-    console.log("[v0] Versuche JSON Server zu erreichen...")
     const response = await fetch(`${API_BASE_URL}/workouts/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(workout),
     })
-    console.log("[v0] JSON Server Response Status:", response.status)
     
     if (!response.ok) {
-
       throw new Error("Failed to update workout")
     }
     
     const result = await response.json()
     return result
   } catch (error) {
-
     const workouts = getLocalWorkouts()
-    console.log("[v0] Anzahl Workouts im localStorage:", workouts.length)
-    
     const index = workouts.findIndex((w) => w.id === id)
-    console.log("[v0] Workout Index gefunden:", index)
     
     if (index === -1) {
-      console.error("[v0] FEHLER: Workout nicht gefunden!")
       throw new Error("Workout not found")
     }
     
-    console.log("[v0] Vor dem Speichern:")
-    console.log("[v0]   Altes Workout:", JSON.stringify(workouts[index], null, 2))
-    console.log("[v0]   Altes isActive:", workouts[index].isActive)
-    console.log("[v0]   Update-Daten:", JSON.stringify(workout, null, 2))
-    console.log("[v0]   Update isActive:", workout.isActive)
-    
     workouts[index] = { ...workouts[index], ...workout }
-    
-    console.log("[v0] Nach dem Merge:")
-    console.log("[v0]   Neues Workout:", JSON.stringify(workouts[index], null, 2))
-    console.log("[v0]   Neues isActive:", workouts[index].isActive)
-    
     saveLocalWorkouts(workouts)
-    console.log("[v0] localStorage gespeichert")
     
-    // Verifiziere das Speichern
-    const verify = getLocalWorkouts()
-    const verified = verify.find((w) => w.id === id)
-    console.log("[v0] Verifizierung:")
-    console.log("[v0]   Workout gefunden:", verified ? "JA" : "NEIN")
-    if (verified) {
-      console.log("[v0]   Verifiziertes isActive:", verified.isActive)
-      console.log("[v0]   Verifiziertes Workout:", JSON.stringify(verified, null, 2))
-    }
-    
-    console.log("[v0] ====== updateWorkout ENDE (localStorage) =====")
     return workouts[index]
   }
 }
@@ -194,13 +163,7 @@ export async function getActiveWorkout(): Promise<Workout | null> {
   } catch (error) {
     console.log("[v0] Using localStorage fallback for getActiveWorkout")
     const workouts = getLocalWorkouts()
-
-    console.log("[v0] DEBUG getActiveWorkout:")
-    console.log("[v0]   Anzahl Workouts:", workouts.length)
-    
     const active = workouts.find((w) => w.isActive)
-    console.log("[v0]   Aktives Workout gefunden:", active ? "JA" : "NEIN")
-
     return active || null
   }
 }

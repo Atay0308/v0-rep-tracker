@@ -37,10 +37,10 @@ export default function StatisticsPage() {
   const { workouts } = useWorkouts()
 
   // State management for filters and selections
-  const [activeTab, setActiveTab] = useState<Tab>("MUSCLES")
+  const [activeTab, setActiveTab] = useState<Tab>("GENERAL")
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("6M")
   const [groupBy, setGroupBy] = useState<GroupBy>("Week")
-  const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup>("Brust")
+  const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | "">("")
   const [selectedExercise, setSelectedExercise] = useState<string>("")
 
   // Filter workouts based on selected time period
@@ -145,7 +145,7 @@ export default function StatisticsPage() {
               <select
                 id="muscle-select"
                 value={selectedMuscle}
-                onChange={(e) => setSelectedMuscle(e.target.value as MuscleGroup)}
+                onChange={(e) => setSelectedMuscle(e.target.value as MuscleGroup | "")}
                 className="w-full px-4 py-2 bg-gray-900 text-white rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 aria-label="Muskelgruppe auswählen"
               >

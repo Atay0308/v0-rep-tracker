@@ -155,45 +155,27 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
   const handleSaveAndFinish = async () => {
     if (!localWorkout) {
-      console.log("[v0] DEBUG handleSaveAndFinish - Abgebrochen: localWorkout fehlt")
       return
     }
 
     try {
-      console.log("[v0] ====== handleSaveAndFinish START =====")
-      console.log("[v0]   Workout ID:", workoutId)
-      console.log("[v0]   Aktuelles isActive:", localWorkout.isActive)
-      
       const now = new Date()
       const endTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`
       const endDate = now.toISOString().split("T")[0]
 
-      console.log("[v0] DEBUG handleSaveAndFinish - Speichere mit endTime:", endTime, "endDate:", endDate)
-      console.log("[v0] DEBUG handleSaveAndFinish - Setze isActive auf false")
-      
       const saved = await updateWorkout(workoutId, {
         ...localWorkout,
         endTime,
         endDate,
         isActive: false,
       })
-      console.log("[v0] DEBUG handleSaveAndFinish - Workout gespeichert:")
-      console.log("[v0]   Gespeichertes isActive:", saved.isActive)
-      console.log("[v0]   Gespeichertes endTime:", saved.endTime)
-      console.log("[v0]   Gespeichertes Workout:", JSON.stringify(saved, null, 2))
 
       setHasChanges(false)
-      console.log("[v0] DEBUG handleSaveAndFinish - Cache invalidation startet")
 
       await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts"), workoutMutate()])
-      console.log("[v0] DEBUG handleSaveAndFinish - Alle Caches invalidiert")
 
-      console.log("[v0] DEBUG handleSaveAndFinish - Navigiere zur Homepage")
       router.push("/")
-      console.log("[v0] DEBUG handleSaveAndFinish - Navigation aufgerufen")
     } catch (error) {
-      console.error("[v0] DEBUG handleSaveAndFinish - FEHLER:", error)
-      console.error("[v0] Error Stack:", (error as Error).stack)
       alert("Fehler beim Speichern")
     }
   }

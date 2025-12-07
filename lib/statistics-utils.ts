@@ -7,6 +7,7 @@
 
 import type { Workout, StatDataPoint, TimePeriod, GroupBy, MuscleGroup } from "@/types/workout"
 import { startOfWeek, startOfMonth, format, subMonths, isAfter } from "date-fns"
+import { calculateDuration } from "@/lib/date-utils" 
 
 /**
  * Filter workouts by time period
@@ -68,7 +69,7 @@ export function filterWorkoutsByPeriod(workouts: Workout[], period: TimePeriod):
  */
 export function calculateMuscleGroupVolume(
   workouts: Workout[],
-  muscleGroup: MuscleGroup,
+  muscleGroup: MuscleGroup | "",
   groupBy: GroupBy,
 ): StatDataPoint[] {
   // Only include completed workouts (not active)
@@ -159,7 +160,6 @@ export function calculateExerciseMaxWeight(
 
     // Find all instances of this exercise in the workout
     const exerciseData = workout.exercises.filter((ex) => ex.exerciseName === exerciseName)
-    console.log(exerciseData, " : exerciseData");
 
     if (exerciseData.length > 0) {
       // Find the maximum weight across all sets
@@ -243,7 +243,7 @@ export function calculateTotalTrainingTime(workouts: Workout[]): number {
       const [startHour, startMin] = w.startTime.split(":").map(Number)
       const [endHour, endMin] = w.endTime!.split(":").map(Number)
       // Calculate duration in minutes
-      const duration = endHour * 60 + endMin - (startHour * 60 + startMin)
+      const duration = calculateDuration(w.startTime, w.endTime!, w.date, w.endDate)
       return total + duration
     }, 0)
 }
