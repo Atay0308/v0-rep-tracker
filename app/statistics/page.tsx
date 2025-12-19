@@ -10,10 +10,10 @@
  */
 
 "use client"
-
+import dynamic from "next/dynamic"
 import { useState } from "react"
 import { NavigationBar } from "@/components/navigation-bar"
-import { StatisticsChart } from "@/components/statistics-chart"
+//import { StatisticsChart } from "@/components/statistics-chart"
 import { useWorkouts } from "@/hooks/use-workouts"
 import { MUSCLE_GROUPS } from "@/lib/exercises-data"
 import {
@@ -28,6 +28,12 @@ import type { TimePeriod, GroupBy, MuscleGroup } from "@/types/workout"
 import { cn } from "@/lib/utils"
 
 type Tab = "GENERAL" | "MUSCLES" | "EXERCISES"
+
+
+// Lazy load StatisticsChart - Recharts wird erst geladen, wenn Chart gerendert wird
+const StatisticsChart = dynamic(() => import("@/components/statistics-chart").then(mod => ({ default: mod.StatisticsChart })), {
+  ssr: false, // Recharts funktioniert besser ohne SSR
+})
 
 /**
  * Statistics page component with tabbed interface for different stat views

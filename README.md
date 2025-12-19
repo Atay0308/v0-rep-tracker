@@ -41,6 +41,26 @@ npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+## Production Build
+
+To build the application for production:
+
+1. Create a production build:
+
+\`\`\`bash
+npm run build
+\`\`\`
+
+2. Start the production server:
+
+\`\`\`bash
+npm start
+\`\`\`
+
+The application will be available at [http://localhost:3000](http://localhost:3000) in production mode.
+
+**Note:** Make sure the JSON server is running if you're using it for data persistence, or configure your production API endpoint accordingly.
+
 ## Running Tests
 
 \`\`\`bash
