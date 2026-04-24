@@ -13,21 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 })
 
-/**
- * SEO Metadata Configuration
- *
- * Optimized metadata for search engines and social media sharing.
- * Includes title, description, keywords, and viewport settings.
- */
 export const metadata: Metadata = {
   title: "Workout Tracker - Track Your Fitness Progress",
   description:
-    "A comprehensive workout tracking application to log exercises, track progress, and analyze your fitness journey. Monitor muscle groups, track max weights, and visualize your training statistics.",
-  keywords: ["workout", "fitness", "exercise", "tracking", "gym", "training", "progress", "statistics", "bodybuilding"],
+    "A comprehensive workout tracking application to log exercises, track progress, and analyze your fitness journey.",
+  keywords: ["workout", "fitness", "exercise", "tracking", "gym", "training", "progress"],
   authors: [{ name: "Workout Tracker" }],
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   themeColor: "#000000",
-  manifest: "/manifest.json",
   openGraph: {
     title: "Workout Tracker - Track Your Fitness Progress",
     description: "Track your workouts, monitor progress, and achieve your fitness goals.",
@@ -37,20 +30,16 @@ export const metadata: Metadata = {
     generator: 'v0.app'
 }
 
-/**
- * Root Layout Component
- *
- * Provides the HTML structure and global styling for the entire application.
- * Includes font configuration and accessibility attributes.
- */
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="de" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body className="bg-black text-white">{children}</body>
+    <html lang="de" style={{ fontFamily: 'var(--font-sans)' }}>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {children}
+      </body>
     </html>
   )
 }

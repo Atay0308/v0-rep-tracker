@@ -5,7 +5,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { TimerButton } from "@/components/timer-button"
 
-
 describe("TimerButton", () => {
   it("should render with initial time", () => {
     render(<TimerButton initialTime={0} />)

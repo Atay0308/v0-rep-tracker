@@ -1,19 +1,3 @@
-/**
- * SetRow Component
- *
- * Displays a single set within an exercise with editable fields.
- *
- * Features:
- * - Set number badge
- * - Weight input (kg) with decimal support
- * - Reps input (whole numbers)
- * - Notes field for set-specific comments
- * - Timer button for tracking rest time
- * - Delete option via 3-dot menu
- *
- * All changes are immediately propagated to parent via onUpdate callback.
- */
-
 "use client"
 
 import { useState } from "react"
@@ -22,20 +6,14 @@ import { TimerButton } from "./timer-button"
 import type { WorkoutSet } from "@/types/workout"
 
 interface SetRowProps {
-  /** The set data to display and edit */
   set: WorkoutSet
-  /** Callback when set data changes */
   onUpdate: (set: WorkoutSet) => void
-  /** Callback when set should be deleted */
   onDelete: () => void
 }
 
 export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
   const [showMenu, setShowMenu] = useState(false)
 
-  /**
-   * Handles set deletion with confirmation
-   */
   const handleDelete = () => {
     if (confirm("Möchtest du diesen Satz wirklich löschen?")) {
       onDelete()
@@ -43,14 +21,32 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
     setShowMenu(false)
   }
 
+  const inputStyle = {
+    width: '4rem',
+    padding: 'var(--spacing-xs) var(--spacing-sm)',
+    backgroundColor: 'var(--color-primary)',
+    color: 'white',
+    borderRadius: 'var(--radius-full)',
+    textAlign: 'center' as const,
+    fontSize: '0.875rem',
+    border: 'none',
+  }
+
   return (
-    <div className="flex items-center gap-2 mb-2">
-      {/* Set number badge */}
-      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-800 text-white text-sm">
+    <div className="set-row">
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '2rem',
+        height: '2rem',
+        borderRadius: 'var(--radius-full)',
+        backgroundColor: 'var(--color-secondary)',
+        fontSize: '0.875rem',
+      }}>
         {set.setNumber}
       </div>
 
-      {/* Weight input - supports decimal values */}
       <input
         type="number"
         min="0"
@@ -61,11 +57,10 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
           const numValue = value === "" ? 0 : Math.max(0, Number.parseFloat(value) || 0)
           onUpdate({ ...set, weight: numValue })
         }}
-        className="w-16 px-2 py-1 bg-blue-600 text-white rounded-full text-center text-sm"
+        style={inputStyle}
         placeholder="kg"
       />
 
-      {/* Reps input - whole numbers only */}
       <input
         type="number"
         min="0"
@@ -76,39 +71,41 @@ export function SetRow({ set, onUpdate, onDelete }: SetRowProps) {
           const numValue = value === "" ? 0 : Math.max(0, Number.parseInt(value) || 0)
           onUpdate({ ...set, reps: numValue })
         }}
-        className="w-16 px-2 py-1 bg-blue-600 text-white rounded-full text-center text-sm"
+        style={inputStyle}
         placeholder="reps"
       />
 
-      {/* Notes input - free text */}
       <input
         type="text"
         value={set.notes || ""}
         onChange={(e) => onUpdate({ ...set, notes: e.target.value })}
-        className="flex-1 px-3 py-1 bg-blue-600 text-white rounded-full text-sm placeholder:text-white/50"
+        style={{
+          ...inputStyle,
+          width: '100%',
+          flex: 1,
+          textAlign: 'left' as const,
+        }}
         placeholder="Notizen"
       />
 
-      {/* Timer button - tracks rest time and saves to breakTime */}
       <TimerButton initialTime={set.breakTime || 0} onTimeChange={(time) => onUpdate({ ...set, breakTime: time })} />
 
-      {/* Delete menu */}
-      <div className="relative">
+      <div style={{ position: 'relative' }}>
         <button
           onClick={() => setShowMenu(!showMenu)}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-800 text-white hover:bg-gray-700 transition-colors"
-          data-testid="set-menu-button"
+          className="btn btn-ghost btn-icon"
+          style={{
+            width: '2rem',
+            height: '2rem',
+            backgroundColor: 'var(--color-secondary)',
+          }}
         >
-          <MoreVertical className="w-4 h-4" />
+          <MoreVertical style={{ width: '1rem', height: '1rem' }} />
         </button>
         {showMenu && (
-          <div className="absolute right-0 top-10 bg-gray-800 rounded-lg shadow-lg z-10 min-w-[120px]">
-            <button
-              onClick={handleDelete}
-              className="w-full flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-700 rounded-lg"
-              data-testid="set-delete-button"
-            >
-              <Trash2 className="w-4 h-4" />
+          <div className="dropdown-menu open">
+            <button onClick={handleDelete} className="dropdown-item danger">
+              <Trash2 style={{ width: '1rem', height: '1rem' }} />
               Löschen
             </button>
           </div>

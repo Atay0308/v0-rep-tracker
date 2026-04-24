@@ -1,18 +1,3 @@
-/**
- * HomePage Component
- *
- * Main landing page of the workout tracker application.
- * Displays:
- * - Current date and week calendar
- * - Start/Continue workout button
- * - Last 3 completed workouts in horizontal scrollable layout
- *
- * Features:
- * - Detects if there's an active workout and changes button text accordingly
- * - Horizontal scrolling for workout cards on mobile
- * - Real-time data fetching with SWR
- */
-
 "use client"
 
 import { Plus, Play } from "lucide-react"
@@ -24,60 +9,56 @@ import { useActiveWorkout, useRecentWorkouts } from "@/hooks/use-workouts"
 import { formatDateLong } from "@/lib/date-utils"
 
 export default function HomePage() {
-  // Fetch active workout to determine button state
-  const { activeWorkout, isLoading: activeLoading } = useActiveWorkout()
-  // Fetch last 3 completed workouts
+  const { activeWorkout } = useActiveWorkout()
   const { recentWorkouts, isLoading: recentLoading } = useRecentWorkouts(3)
-
   const today = new Date()
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      {/* Header with formatted date */}
-      <header className="p-6">
-        <div className="text-gray-400 text-sm mb-1">{formatDateLong(today).split(",")[0]}</div>
-        <h1 className="text-2xl font-bold text-white">{formatDateLong(today).split(",")[1]}</h1>
+    <div className="page">
+      <header className="page-content">
+        <div className="text-muted text-sm">{formatDateLong(today).split(",")[0]}</div>
+        <h1 className="text-2xl font-bold">{formatDateLong(today).split(",")[1]}</h1>
       </header>
 
-      {/* Week Calendar - shows current week with today highlighted */}
-      <div className="px-6 mb-8">
+      <div className="page-content">
         <WeekCalendar />
       </div>
 
-      {/* Start/Continue Workout Button - changes based on active workout status */}
-      <div className="px-6 mb-8">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold mb-6 whitespace-pre-line">
-            {activeWorkout ? "Training fortsetzen" : "Neues Training\nstarten"}
-          </h2>
-          <Link
-            href={activeWorkout ? `/workout/${activeWorkout.id}` : "/workout/new"}
-            className={`inline-flex items-center justify-center w-20 h-20 rounded-full transition-colors ${
-              activeWorkout ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"
-            }`}
-            aria-label={activeWorkout ? "Training fortsetzen" : "Neues Training starten"}
-          >
-            {activeWorkout ? (
-              <Play className="w-10 h-10 text-white fill-white" />
-            ) : (
-              <Plus className="w-10 h-10 text-white" />
-            )}
-          </Link>
-        </div>
+      <div className="page-content" style={{ textAlign: 'center', marginTop: 'var(--spacing-xl)' }}>
+        <h2 className="text-xl font-medium mb-lg" style={{ whiteSpace: 'pre-line' }}>
+          {activeWorkout ? "Training fortsetzen" : "Neues Training\nstarten"}
+        </h2>
+        <Link
+          href={activeWorkout ? `/workout/${activeWorkout.id}` : "/workout/new"}
+          className="btn btn-icon"
+          style={{
+            width: '5rem',
+            height: '5rem',
+            backgroundColor: activeWorkout ? 'var(--color-success)' : 'var(--color-primary)',
+          }}
+          aria-label={activeWorkout ? "Training fortsetzen" : "Neues Training starten"}
+        >
+          {activeWorkout ? (
+            <Play style={{ width: '2.5rem', height: '2.5rem', fill: 'white' }} />
+          ) : (
+            <Plus style={{ width: '2.5rem', height: '2.5rem' }} />
+          )}
+        </Link>
       </div>
 
-      {/* Recent Workouts - horizontal scrollable layout */}
-      <div className="px-6">
-        <h3 className="text-lg font-semibold mb-4 text-center">Letzten 3 Trainingseinheiten</h3>
+      <div className="page-content mt-xl">
+        <h3 className="text-lg font-medium text-center mb-md">Letzten 3 Trainingseinheiten</h3>
 
         {recentLoading ? (
-          <div className="text-gray-400 text-center py-8">Laden...</div>
+          <div className="loading">
+            <div className="loading-spinner"></div>
+          </div>
         ) : recentWorkouts && recentWorkouts.length > 0 ? (
-          <div className="flex justify-center">
-            <div className="overflow-x-auto pb-4 max-w-full">
-              <div className="flex gap-4 justify-center">
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ overflowX: 'auto', paddingBottom: 'var(--spacing-md)', maxWidth: '100%' }}>
+              <div style={{ display: 'flex', gap: 'var(--spacing-md)', justifyContent: 'center' }}>
                 {recentWorkouts.map((workout) => (
-                  <div key={workout.id} className="w-80 flex-shrink-0">
+                  <div key={workout.id} style={{ width: '20rem', flexShrink: 0 }}>
                     <WorkoutCard workout={workout} />
                   </div>
                 ))}
@@ -85,7 +66,9 @@ export default function HomePage() {
             </div>
           </div>
         ) : (
-          <div className="text-gray-400 text-center py-8">Noch keine Trainingseinheiten</div>
+          <div className="text-muted text-center" style={{ padding: 'var(--spacing-xl) 0' }}>
+            Noch keine Trainingseinheiten
+          </div>
         )}
       </div>
 

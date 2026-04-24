@@ -1,7 +1,3 @@
-/**
- * Workout card component for history page
- */
-
 import Link from "next/link"
 import type { Workout } from "@/types/workout"
 import { formatDateShort, calculateDuration } from "@/lib/date-utils"
@@ -13,7 +9,6 @@ interface HistoryWorkoutCardProps {
 export function HistoryWorkoutCard({ workout }: HistoryWorkoutCardProps) {
   const duration = workout.endTime ? calculateDuration(workout.startTime, workout.endTime) : 0
 
-  // Group exercises by name and count sets
   const exerciseSummary = workout.exercises.reduce(
     (acc, exercise) => {
       const existing = acc.find((e) => e.name === exercise.exerciseName)
@@ -31,30 +26,34 @@ export function HistoryWorkoutCard({ workout }: HistoryWorkoutCardProps) {
   )
 
   return (
-    <div className="mb-6">
-      {/* Date header */}
-      <div className="text-gray-400 text-sm mb-2">{formatDateShort(new Date(workout.date))}</div>
+    <div className="mb-lg">
+      <div className="text-muted text-sm mb-sm">
+        {formatDateShort(new Date(workout.date))}
+      </div>
 
-      {/* Workout card */}
-      <div className="rounded-2xl bg-blue-600 p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-white font-medium text-lg">
+      <div style={{
+        borderRadius: 'var(--radius-xl)',
+        backgroundColor: 'var(--color-primary)',
+        padding: 'var(--spacing-md)',
+      }}>
+        <div className="flex-between mb-sm">
+          <h3 className="font-medium text-lg">
             {workout.name || "Unbenanntes Training"} ({duration} Min)
           </h3>
         </div>
 
-        <div className="space-y-1 mb-4">
+        <div className="mb-md">
           {exerciseSummary.map((exercise, index) => (
-            <div key={index} className="text-white/90 text-sm">
+            <div key={index} className="text-sm" style={{ opacity: 0.9 }}>
               {exercise.sets}x {exercise.name}
             </div>
           ))}
         </div>
 
-        <div className="text-right">
+        <div style={{ textAlign: 'right' }}>
           <Link
             href={`/workout/${workout.id}`}
-            className="inline-block text-white/70 hover:text-white text-sm transition-colors"
+            style={{ opacity: 0.7, fontSize: '0.875rem' }}
           >
             Details
           </Link>

@@ -1,18 +1,3 @@
-/**
- * ExerciseCard Component
- *
- * Displays all sets for a single exercise within a workout.
- *
- * Features:
- * - Exercise name header with delete option
- * - Column labels for set data (weight, reps, notes)
- * - List of all sets with edit/delete capabilities
- * - Add new set button
- * - 3-dot menu for exercise-level actions (delete)
- *
- * All set operations are delegated to parent component via callbacks.
- */
-
 "use client"
 
 import { useState } from "react"
@@ -21,24 +6,16 @@ import { SetRow } from "./set-row"
 import type { WorkoutExercise, WorkoutSet } from "@/types/workout"
 
 interface ExerciseCardProps {
-  /** The exercise data including all sets */
   exercise: WorkoutExercise
-  /** Callback when a set is updated */
   onUpdateSet: (setId: string, set: WorkoutSet) => void
-  /** Callback when a set is deleted */
   onDeleteSet: (setId: string) => void
-  /** Callback when adding a new set */
   onAddSet: () => void
-  /** Callback when deleting the entire exercise */
   onDeleteExercise: () => void
 }
 
 export function ExerciseCard({ exercise, onUpdateSet, onDeleteSet, onAddSet, onDeleteExercise }: ExerciseCardProps) {
   const [showMenu, setShowMenu] = useState(false)
 
-  /**
-   * Handles exercise deletion with confirmation
-   */
   const handleDelete = () => {
     if (confirm(`Möchtest du "${exercise.exerciseName}" wirklich löschen?`)) {
       onDeleteExercise()
@@ -47,21 +24,21 @@ export function ExerciseCard({ exercise, onUpdateSet, onDeleteSet, onAddSet, onD
   }
 
   return (
-    <div className="bg-gray-900 rounded-2xl p-4 mb-4">
-      {/* Exercise header with name and delete menu */}
-      <div className="flex items-center justify-between mb-4 relative">
-        <h3 className="text-white font-medium">{exercise.exerciseName}</h3>
-        <div className="relative">
-          <button onClick={() => setShowMenu(!showMenu)} className="text-gray-400 hover:text-white">
-            <MoreVertical className="w-5 h-5" />
+    <div className="card mb-md">
+      <div className="flex-between mb-md" style={{ position: 'relative' }}>
+        <h3 className="font-medium">{exercise.exerciseName}</h3>
+        <div style={{ position: 'relative' }}>
+          <button 
+            onClick={() => setShowMenu(!showMenu)} 
+            className="btn btn-ghost btn-icon"
+            style={{ width: '2rem', height: '2rem' }}
+          >
+            <MoreVertical style={{ width: '1.25rem', height: '1.25rem', color: 'var(--color-muted)' }} />
           </button>
           {showMenu && (
-            <div className="absolute right-0 top-8 bg-gray-800 rounded-lg shadow-lg z-10 min-w-[150px]">
-              <button
-                onClick={handleDelete}
-                className="w-full flex items-center gap-2 px-4 py-2 text-red-500 hover:bg-gray-700 rounded-lg"
-              >
-                <Trash2 className="w-4 h-4" />
+            <div className="dropdown-menu open">
+              <button onClick={handleDelete} className="dropdown-item danger">
+                <Trash2 style={{ width: '1rem', height: '1rem' }} />
                 Löschen
               </button>
             </div>
@@ -69,17 +46,14 @@ export function ExerciseCard({ exercise, onUpdateSet, onDeleteSet, onAddSet, onD
         </div>
       </div>
 
-      {/* Column labels for set data */}
-      <div className="flex items-center gap-2 mb-2 text-xs text-gray-400">
-        <div className="w-8"></div>
-        <div className="w-16 text-center">Gewicht</div>
-        <div className="w-16 text-center">Wdh.</div>
-        <div className="flex-1 text-center">Notizen</div>
-        <div className="w-24"></div>
-        <div className="w-8"></div>
+      <div className="set-row text-xs text-muted" style={{ marginBottom: 'var(--spacing-sm)' }}>
+        <div></div>
+        <div style={{ textAlign: 'center' }}>Gewicht</div>
+        <div style={{ textAlign: 'center' }}>Wdh.</div>
+        <div style={{ textAlign: 'center' }}>Notizen</div>
+        <div></div>
       </div>
 
-      {/* List of all sets */}
       {exercise.sets.map((set) => (
         <SetRow
           key={set.id}
@@ -89,8 +63,10 @@ export function ExerciseCard({ exercise, onUpdateSet, onDeleteSet, onAddSet, onD
         />
       ))}
 
-      {/* Add set button */}
-      <button onClick={onAddSet} className="w-full mt-2 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+      <button 
+        onClick={onAddSet} 
+        className="btn btn-ghost btn-full mt-sm text-sm"
+      >
         Satz hinzufügen
       </button>
     </div>

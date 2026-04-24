@@ -2,21 +2,25 @@
 
 import { useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { createWorkout } from "@/lib/workout-api"
+import { createWorkout, getActiveWorkout } from "@/lib/workout-api"
 
 export default function NewWorkoutPage() {
   const router = useRouter()
   const hasCreated = useRef(false)
 
   useEffect(() => {
-    if (hasCreated.current) {
-      return
-    }
+    if (hasCreated.current) return
 
     const initWorkout = async () => {
       try {
-        console.log("[v0] Creating new workout...")
         hasCreated.current = true
+
+        const existingActive = await getActiveWorkout()
+        if (existingActive) {
+          router.replace(`/workout/${existingActive.id}`)
+          return
+        }
+
         const now = new Date()
         const workout = await createWorkout({
           name: "",
@@ -29,18 +33,15 @@ export default function NewWorkoutPage() {
           exercises: [],
         })
 
-        console.log("[v0] Workout created:", workout)
-
         if (!workout.id) {
           throw new Error("Workout ID is missing")
         }
 
-        console.log("[v0] Navigating to workout:", workout.id)
         router.replace(`/workout/${workout.id}`)
       } catch (error) {
         console.error("[v0] Failed to create workout:", error)
         hasCreated.current = false
-        alert("Fehler beim Erstellen des Trainings. Bitte versuchen Sie es erneut.")
+        alert("Fehler beim Erstellen des Trainings.")
         router.replace("/")
       }
     }
@@ -49,10 +50,10 @@ export default function NewWorkoutPage() {
   }, [router])
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
+    <div className="page flex-center" style={{ minHeight: '100vh' }}>
       <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-400">Training wird erstellt...</p>
+        <div className="loading-spinner" style={{ margin: '0 auto var(--spacing-md)' }}></div>
+        <p className="text-muted">Training wird erstellt...</p>
       </div>
     </div>
   )

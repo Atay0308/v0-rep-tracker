@@ -1,7 +1,3 @@
-/**
- * Muscle group selection page
- */
-
 "use client"
 
 import { use } from "react"
@@ -30,29 +26,49 @@ export default function SelectMusclePage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <button onClick={() => router.back()} className="text-blue-500 hover:text-blue-400">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="page">
+      <header className="page-header">
+        <button onClick={() => router.back()} className="btn btn-ghost btn-icon">
+          <ArrowLeft style={{ width: '1.5rem', height: '1.5rem' }} />
         </button>
-        <h1 className="text-xl font-semibold">Muskelbereich auswählen</h1>
-        <button className="text-blue-500 hover:text-blue-400">
-          <Search className="w-6 h-6" />
+        <h1 className="page-title">Muskelbereich auswählen</h1>
+        <button className="btn btn-ghost btn-icon">
+          <Search style={{ width: '1.5rem', height: '1.5rem' }} />
         </button>
       </header>
 
-      {/* Muscle groups grid */}
-      <div className="grid grid-cols-2 gap-4 p-4">
+      <div className="muscle-grid" style={{ padding: 'var(--spacing-md)' }}>
         {MUSCLE_GROUPS.map((muscle) => (
           <button
             key={muscle}
             onClick={() => handleMuscleSelect(muscle)}
-            className="relative aspect-square rounded-2xl overflow-hidden group"
+            className="muscle-card"
+            style={{
+              position: 'relative',
+              aspectRatio: '1',
+              padding: 0,
+              overflow: 'hidden',
+            }}
           >
-            <img src={muscleImages[muscle] || "/placeholder.svg"} alt={muscle} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-4">
-              <span className="text-white text-lg font-semibold">{muscle}</span>
+            <img 
+              src={muscleImages[muscle] || "/placeholder.svg"} 
+              alt={muscle} 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4), transparent)',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              paddingBottom: 'var(--spacing-md)',
+            }}>
+              <span style={{ fontSize: '1.125rem', fontWeight: 600 }}>{muscle}</span>
             </div>
           </button>
         ))}

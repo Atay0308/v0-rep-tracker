@@ -1,19 +1,18 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { use, useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, MoreVertical, Trash2 } from "lucide-react"
 import useSWR from "swr"
 import { useSWRConfig } from "swr"
 import { ExerciseCard } from "@/components/exercise-card"
+import { DropdownMenu, DropdownMenuItem } from "@/components/dropdown-menu"
 import { getWorkout, updateWorkout, deleteWorkout } from "@/lib/workout-api"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { Workout, WorkoutSet } from "@/types/workout"
-import { use } from "react"
 
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
-  const {id : workoutId} = use(params);
+  const { id: workoutId } = use(params)
   const { mutate } = useSWRConfig()
 
   const { data: workout, mutate: workoutMutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
@@ -118,7 +117,6 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
   const handleAddExercise = async () => {
     if (!localWorkout) return
 
-    // Save current state before navigating
     if (hasChanges) {
       try {
         await updateWorkout(workoutId, localWorkout)
@@ -133,37 +131,31 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
   }
 
   const handleSaveWorkout = async () => {
-    if (!localWorkout || !hasChanges) {
-      return
-    }
+    if (!localWorkout || !hasChanges) return
 
     try {
-
-      const saved = await updateWorkout(workoutId, localWorkout)
-
+      await updateWorkout(workoutId, localWorkout)
       setHasChanges(false)
       await workoutMutate()
       await mutate("active-workout")
       await mutate("recent-workouts-3")
       await mutate("workouts")
-
-     alert("Training gespeichert!")
+      alert("Training gespeichert!")
     } catch (error) {
+      console.error("[v0] Failed to save workout:", error)
       alert("Fehler beim Speichern")
     }
   }
 
   const handleSaveAndFinish = async () => {
-    if (!localWorkout) {
-      return
-    }
+    if (!localWorkout) return
 
     try {
       const now = new Date()
       const endTime = `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`
       const endDate = now.toISOString().split("T")[0]
 
-      const saved = await updateWorkout(workoutId, {
+      await updateWorkout(workoutId, {
         ...localWorkout,
         endTime,
         endDate,
@@ -171,11 +163,12 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
       })
 
       setHasChanges(false)
-
       await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts"), workoutMutate()])
 
+      alert("Training gespeichert!")
       router.push("/")
     } catch (error) {
+      console.error("[v0] Failed to save workout:", error)
       alert("Fehler beim Speichern")
     }
   }
@@ -187,12 +180,10 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
     try {
       await deleteWorkout(workoutId)
-
       await Promise.all([mutate("active-workout"), mutate("recent-workouts-3"), mutate("workouts")])
-
       router.replace("/")
     } catch (error) {
-      console.error("Failed to delete workout:", error)
+      console.error("[v0] Failed to delete workout:", error)
       alert("Fehler beim Löschen des Trainings")
     }
   }
@@ -209,45 +200,48 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
   if (!localWorkout) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+      <div className="page flex-center" style={{ minHeight: '100vh' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-400">Laden...</p>
+          <div className="loading-spinner" style={{ margin: '0 auto var(--spacing-md)' }}></div>
+          <p className="text-muted">Laden...</p>
         </div>
       </div>
     )
   }
 
+  const inputStyle = {
+    padding: 'var(--spacing-sm) var(--spacing-md)',
+    backgroundColor: 'var(--color-primary)',
+    color: 'white',
+    borderRadius: 'var(--radius-full)',
+    border: 'none',
+    fontSize: '1rem',
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <button onClick={handleBack} className="text-blue-500 hover:text-blue-400" aria-label="Zurück">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="page">
+      <header className="page-header">
+        <button onClick={handleBack} className="btn btn-ghost btn-icon">
+          <ArrowLeft style={{ width: '1.5rem', height: '1.5rem' }} />
         </button>
-        <h1 className="text-xl font-semibold">{localWorkout.date.split("-").reverse().join(".")}</h1>
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-blue-500 hover:text-blue-400" aria-label="Workout Optionen">
-                <MoreVertical className="w-6 h-6" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={handleDeleteWorkout}
-                className="text-red-500 focus:text-red-500 cursor-pointer"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Workout löschen
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+        <h1 className="page-title">{localWorkout.date.split("-").reverse().join(".")}</h1>
+        <DropdownMenu
+          trigger={
+            <button className="btn btn-ghost btn-icon">
+              <MoreVertical style={{ width: '1.5rem', height: '1.5rem' }} />
+            </button>
+          }
+        >
+          <DropdownMenuItem onClick={handleDeleteWorkout} variant="danger">
+            <Trash2 style={{ width: '1rem', height: '1rem' }} />
+            Workout löschen
+          </DropdownMenuItem>
+        </DropdownMenu>
       </header>
 
-      <div className="p-4 space-y-4">
-        <div>
-          <label className="text-gray-400 text-sm mb-1 block">Name</label>
+      <div className="page-content">
+        <div className="form-group mb-md">
+          <label className="form-label">Name</label>
           <input
             type="text"
             value={localWorkout.name}
@@ -255,32 +249,32 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
               setLocalWorkout((prev) => (prev ? { ...prev, name: e.target.value } : prev))
               setHasChanges(true)
             }}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-full"
+            style={{ ...inputStyle, width: '100%' }}
             placeholder="Workout Name"
           />
         </div>
 
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="text-gray-400 text-sm mb-1 block">Datum</label>
+        <div className="flex gap-md mb-md">
+          <div className="form-group" style={{ flex: 1 }}>
+            <label className="form-label">Datum</label>
             <input
               type="text"
               value={localWorkout.date.split("-").reverse().join(". ")}
               readOnly
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-full"
+              style={{ ...inputStyle, width: '100%' }}
             />
           </div>
-          <div>
-            <label className="text-gray-400 text-sm mb-1 block">Startzeit</label>
+          <div className="form-group">
+            <label className="form-label">Startzeit</label>
             <input
               type="text"
               value={localWorkout.startTime}
               readOnly
-              className="w-24 px-4 py-2 bg-blue-600 text-white rounded-full text-center"
+              style={{ ...inputStyle, width: '6rem', textAlign: 'center' }}
             />
           </div>
-          <div>
-            <label className="text-gray-400 text-sm mb-1 block">Endzeit</label>
+          <div className="form-group">
+            <label className="form-label">Endzeit</label>
             <input
               type="time"
               value={localWorkout.endTime || ""}
@@ -288,27 +282,30 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
                 setLocalWorkout((prev) => (prev ? { ...prev, endTime: e.target.value } : prev))
                 setHasChanges(true)
               }}
-              placeholder="--:--"
-              className="w-24 px-4 py-2 bg-blue-600 text-white rounded-full text-center"
+              style={{ ...inputStyle, width: '6rem', textAlign: 'center' }}
             />
           </div>
         </div>
 
-        <div>
-          <label className="text-gray-400 text-sm mb-1 block">Notizen</label>
+        <div className="form-group mb-lg">
+          <label className="form-label">Notizen</label>
           <textarea
             value={localWorkout.notes || ""}
             onChange={(e) => {
               setLocalWorkout((prev) => (prev ? { ...prev, notes: e.target.value } : prev))
               setHasChanges(true)
             }}
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-2xl min-h-[80px]"
+            style={{
+              ...inputStyle,
+              width: '100%',
+              minHeight: '5rem',
+              borderRadius: 'var(--radius-xl)',
+              resize: 'vertical',
+            }}
             placeholder="Notizen zum Training..."
           />
         </div>
-      </div>
 
-      <div className="px-4">
         {localWorkout.exercises.map((exercise) => (
           <ExerciseCard
             key={exercise.id}
@@ -319,38 +316,40 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
             onDeleteExercise={() => handleDeleteExercise(exercise.id)}
           />
         ))}
-      </div>
 
-      <div className="px-4 mt-6">
         <button
           onClick={handleAddExercise}
-          className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full font-medium transition-colors"
+          className="btn btn-primary btn-full btn-lg"
+          style={{ borderRadius: 'var(--radius-full)', marginTop: 'var(--spacing-lg)' }}
         >
           + Übung hinzufügen
         </button>
-      </div>
 
-      {localWorkout.isActive ? (
-        <div className="px-4 mt-4">
+        {localWorkout.isActive ? (
           <button
             onClick={handleSaveAndFinish}
-            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-full font-medium transition-colors"
+            className="btn btn-success btn-full btn-lg"
+            style={{ borderRadius: 'var(--radius-full)', marginTop: 'var(--spacing-md)' }}
           >
             Training speichern
           </button>
-        </div>
-      ) : (
-        hasChanges && (
-          <div className="px-4 mt-4">
+        ) : (
+          hasChanges && (
             <button
               onClick={handleSaveWorkout}
-              className="w-full py-3 bg-yellow-600 hover:bg-yellow-700 text-white rounded-full font-medium transition-colors"
+              className="btn btn-full btn-lg"
+              style={{ 
+                borderRadius: 'var(--radius-full)', 
+                marginTop: 'var(--spacing-md)',
+                backgroundColor: 'var(--color-warning)',
+                color: 'white',
+              }}
             >
               Änderungen speichern
             </button>
-          </div>
-        )
-      )}
+          )
+        )}
+      </div>
     </div>
   )
 }

@@ -3,7 +3,6 @@
 import type React from "react"
 import { useState, useEffect, useRef } from "react"
 import { Timer, Pause } from "lucide-react"
-import { cn } from "@/lib/utils"
 
 interface TimerButtonProps {
   initialTime?: number
@@ -30,7 +29,6 @@ export function TimerButton({ initialTime = 0, onComplete, onTimeChange }: Timer
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
-      // Save time when timer stops using ref
       if (time > 0 && onTimeChangeRef.current) {
         onTimeChangeRef.current(time)
       }
@@ -59,25 +57,30 @@ export function TimerButton({ initialTime = 0, onComplete, onTimeChange }: Timer
     }
   }
 
-  const handleReset = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setIsRunning(false)
-    setTime(0)
-    if (onTimeChangeRef.current) {
-      onTimeChangeRef.current(0)
-    }
-  }
-
   return (
     <button
       onClick={handleClick}
-      className={cn(
-        "flex items-center gap-2 px-3 py-2 rounded-full transition-colors",
-        isRunning ? "bg-blue-600 text-white" : "bg-gray-800 text-gray-300",
-      )}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 'var(--spacing-sm)',
+        padding: 'var(--spacing-sm) var(--spacing-md)',
+        borderRadius: 'var(--radius-full)',
+        backgroundColor: isRunning ? 'var(--color-primary)' : 'var(--color-secondary)',
+        color: isRunning ? 'white' : 'var(--color-muted-light)',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'all var(--transition-fast)',
+      }}
     >
-      {isRunning ? <Pause className="w-4 h-4" /> : <Timer className="w-4 h-4" />}
-      <span className="text-sm font-mono">{formatTime(time)}</span>
+      {isRunning ? (
+        <Pause style={{ width: '1rem', height: '1rem' }} />
+      ) : (
+        <Timer style={{ width: '1rem', height: '1rem' }} />
+      )}
+      <span style={{ fontSize: '0.875rem', fontFamily: 'var(--font-mono)' }}>
+        {formatTime(time)}
+      </span>
     </button>
   )
 }

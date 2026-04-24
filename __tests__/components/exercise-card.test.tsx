@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react"
 import { ExerciseCard } from "@/components/exercise-card"
 import type { WorkoutExercise } from "@/types/workout"
-import { jest } from "@jest/globals" // Declare the jest variable
+import jest from "jest" // Declare the jest variable
 
 describe("ExerciseCard", () => {
   const mockExercise: WorkoutExercise = {

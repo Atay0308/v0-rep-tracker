@@ -1,10 +1,6 @@
-/**
- * Exercise selection page
- */
-
 "use client"
 
-import { useState, use } from "react"
+import { use, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowLeft, Search, Plus, MoreVertical, X } from "lucide-react"
 import { getExercisesByMuscleGroup, addCustomExercise } from "@/lib/exercises-data"
@@ -73,66 +69,87 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <button onClick={() => router.back()} className="text-blue-500 hover:text-blue-400">
-          <ArrowLeft className="w-6 h-6" />
+    <div className="page">
+      <header className="page-header">
+        <button onClick={() => router.back()} className="btn btn-ghost btn-icon">
+          <ArrowLeft style={{ width: '1.5rem', height: '1.5rem' }} />
         </button>
-        <h1 className="text-xl font-semibold">({muscleGroup})</h1>
-        <div className="flex gap-2">
-          <button onClick={() => setShowAddDialog(true)} className="text-blue-500 hover:text-blue-400">
-            <Plus className="w-6 h-6" />
+        <h1 className="page-title">({muscleGroup})</h1>
+        <div className="flex gap-sm">
+          <button onClick={() => setShowAddDialog(true)} className="btn btn-ghost btn-icon">
+            <Plus style={{ width: '1.5rem', height: '1.5rem' }} />
           </button>
-          <button onClick={() => setShowSearch(!showSearch)} className="text-blue-500 hover:text-blue-400">
-            <Search className="w-6 h-6" />
+          <button onClick={() => setShowSearch(!showSearch)} className="btn btn-ghost btn-icon">
+            <Search style={{ width: '1.5rem', height: '1.5rem' }} />
           </button>
         </div>
       </header>
 
       {showSearch && (
-        <div className="p-4 border-b border-gray-800">
+        <div style={{ padding: 'var(--spacing-md)', borderBottom: '1px solid var(--color-border)' }}>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Übung suchen..."
-            className="w-full px-4 py-2 bg-gray-900 text-white rounded-full"
+            className="form-input"
+            style={{ borderRadius: 'var(--radius-full)' }}
             autoFocus
           />
         </div>
       )}
 
-      {/* Exercise list */}
-      <div className="p-4">
-        {filteredExercises.map((exercise) => (
-          <div key={exercise.id} className="flex items-center justify-between p-4 mb-2 bg-gray-900 rounded-lg">
-            <button
-              onClick={() => handleExerciseSelect(exercise.name)}
-              className="flex-1 text-left text-white hover:text-blue-400 transition-colors"
-            >
-              {exercise.name}
-            </button>
-            <button onClick={() => handleDeleteExercise(exercise.id)} className="text-gray-400 hover:text-red-500 ml-2">
-              <MoreVertical className="w-5 h-5" />
-            </button>
-          </div>
-        ))}
+      <div className="page-content">
+        <div className="exercise-list">
+          {filteredExercises.map((exercise) => (
+            <div key={exercise.id} className="exercise-item">
+              <button
+                onClick={() => handleExerciseSelect(exercise.name)}
+                style={{
+                  flex: 1,
+                  textAlign: 'left',
+                  background: 'none',
+                  border: 'none',
+                  color: 'white',
+                  cursor: 'pointer',
+                }}
+              >
+                {exercise.name}
+              </button>
+              <button 
+                onClick={() => handleDeleteExercise(exercise.id)} 
+                className="btn btn-ghost btn-icon"
+                style={{ width: '2rem', height: '2rem' }}
+              >
+                <MoreVertical style={{ width: '1.25rem', height: '1.25rem', color: 'var(--color-muted)' }} />
+              </button>
+            </div>
+          ))}
 
-        {filteredExercises.length === 0 && (
-          <div className="text-center py-12 text-gray-400">
-            {searchQuery ? "Keine Übungen gefunden" : "Keine Übungen verfügbar"}
-          </div>
-        )}
+          {filteredExercises.length === 0 && (
+            <div className="text-center text-muted" style={{ padding: 'var(--spacing-xl) 0' }}>
+              {searchQuery ? "Keine Übungen gefunden" : "Keine Übungen verfügbar"}
+            </div>
+          )}
+        </div>
       </div>
 
       {showAddDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-md">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Neue Übung hinzufügen</h2>
-              <button onClick={() => setShowAddDialog(false)} className="text-gray-400 hover:text-white">
-                <X className="w-6 h-6" />
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          backgroundColor: 'rgba(0,0,0,0.75)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+          padding: 'var(--spacing-md)',
+        }}>
+          <div className="card" style={{ width: '100%', maxWidth: '28rem' }}>
+            <div className="flex-between mb-md">
+              <h2 className="text-xl font-medium">Neue Übung hinzufügen</h2>
+              <button onClick={() => setShowAddDialog(false)} className="btn btn-ghost btn-icon">
+                <X style={{ width: '1.5rem', height: '1.5rem' }} />
               </button>
             </div>
             <input
@@ -140,20 +157,23 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
               value={newExerciseName}
               onChange={(e) => setNewExerciseName(e.target.value)}
               placeholder="Übungsname"
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded-full mb-4"
+              className="form-input mb-md"
+              style={{ borderRadius: 'var(--radius-full)' }}
               autoFocus
             />
-            <div className="flex gap-2">
+            <div className="flex gap-sm">
               <button
                 onClick={() => setShowAddDialog(false)}
-                className="flex-1 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full"
+                className="btn btn-secondary btn-full"
+                style={{ borderRadius: 'var(--radius-full)' }}
               >
                 Abbrechen
               </button>
               <button
                 onClick={handleAddCustomExercise}
                 disabled={!newExerciseName.trim()}
-                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn btn-primary btn-full"
+                style={{ borderRadius: 'var(--radius-full)' }}
               >
                 Hinzufügen
               </button>
@@ -161,15 +181,6 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
           </div>
         </div>
       )}
-
-      {/* Background image */}
-      <div className="fixed bottom-0 left-0 right-0 h-1/2 -z-10">
-        <img
-          src="/images/design-mode/%C3%9Cbung%20ausw%C3%A4hlen.png"
-          alt="Exercise"
-          className="w-full h-full object-cover opacity-30"
-        />
-      </div>
     </div>
   )
 }

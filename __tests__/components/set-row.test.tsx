@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
+import { render, screen, fireEvent } from "@testing-library/react"
 import { SetRow } from "@/components/set-row"
 import type { WorkoutSet } from "@/types/workout"
 import { jest } from "@jest/globals"
@@ -86,16 +86,16 @@ describe("SetRow", () => {
     })
   })
 
-  it("calls onDelete with confirmation", async () => {
+  it("calls onDelete with confirmation", () => {
     global.confirm = jest.fn(() => true)
     render(<SetRow set={mockSet} {...mockCallbacks} />)
 
     const menuButtons = screen.getAllByRole("button")
-    const threeDotsButton = screen.getByTestId("set-menu-button")
+    const threeDotsButton = menuButtons.find((btn) => btn.querySelector("svg"))
 
     if (threeDotsButton) {
       fireEvent.click(threeDotsButton)
-      const deleteButton = await waitFor(() => screen.getByTestId("set-delete-button"),  { timeout: 3000 })
+      const deleteButton = screen.getByText("Löschen")
       fireEvent.click(deleteButton)
 
       expect(mockCallbacks.onDelete).toHaveBeenCalledTimes(1)
