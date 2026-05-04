@@ -38,7 +38,7 @@ export default function HomePage() {
         <div className="text-gray-400 text-sm mb-1">{formatDateLong(today).split(",")[0]}</div>
         <h1 className="text-2xl font-bold text-white">{formatDateLong(today).split(",")[1]}</h1>
       </header>
-
+    
       {/* Week Calendar - shows current week with today highlighted */}
       <div className="px-6 mb-8">
         <WeekCalendar />

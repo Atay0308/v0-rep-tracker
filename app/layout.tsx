@@ -2,6 +2,7 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+import Sidebar from "../components/SideBar/side-bar"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,8 +26,6 @@ export const metadata: Metadata = {
     "A comprehensive workout tracking application to log exercises, track progress, and analyze your fitness journey. Monitor muscle groups, track max weights, and visualize your training statistics.",
   keywords: ["workout", "fitness", "exercise", "tracking", "gym", "training", "progress", "statistics", "bodybuilding"],
   authors: [{ name: "Workout Tracker" }],
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
-  themeColor: "#000000",
   manifest: "/manifest.json",
   openGraph: {
     title: "Workout Tracker - Track Your Fitness Progress",
@@ -35,6 +34,18 @@ export const metadata: Metadata = {
     locale: "de_DE",
   },
     generator: 'v0.app'
+}
+
+/**
+ * Viewport Configuration
+ *
+ * Defines the viewport settings for responsive design.
+ */
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#000000",
 }
 
 /**
@@ -50,7 +61,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body className="bg-black text-white">{children}</body>
+      <body className="bg-black text-white">
+        <Sidebar />
+        {children}
+      </body>
     </html>
   )
 }

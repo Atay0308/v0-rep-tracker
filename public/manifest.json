@@ -1,0 +1,16 @@
+{
+  "name": "Workout Tracker",
+  "short_name": "Workout",
+  "description": "A comprehensive workout tracker to log exercises, track progress, and analyze your fitness journey.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

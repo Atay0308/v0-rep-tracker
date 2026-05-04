@@ -23,12 +23,12 @@ export default function PlansPage() {
   return (
     <div className="min-h-screen bg-black text-white pb-24">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
-        <button onClick={() => router.push("/")} className="text-blue-500 hover:text-blue-400">
-          <ArrowLeft className="w-6 h-6" />
-        </button>
-        <h1 className="text-xl font-semibold">Trainingspläne</h1>
-        <div className="flex gap-2">
+      <header className="relative flex items-center justify-between p-4 border-b border-gray-800">
+        <h1 className="absolute left-1/2 -translate-x-1/2 text-xl font-semibold">
+          Trainingspläne
+        </h1>
+
+        <div className="flex gap-6 ml-auto">
           <button className="text-blue-500 hover:text-blue-400">
             <Plus className="w-6 h-6" />
           </button>
