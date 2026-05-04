@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+ 
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@map("sessions")
+}
+ 
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  
+  workouts  Workout[]
+  exercises Exercise[]      // Custom User-Übungen
+
+  @@map("users")
+}
+ 
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+ 
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Workout {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  name      String?
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  
+  notes     String?
+  isActive  Boolean  @default(true)
+  
+  updatedAt DateTime @updatedAt
+  
+  exercises WorkoutExercise[]
+}
+
+model WorkoutExercise {
+  id         String   @id @default(cuid())
+  workoutId  String
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  
+  exerciseId String?
+  exercise   Exercise? @relation(fields: [exerciseId], references: [id])  // Optional für globale  
+  order      Int      @default(0)
+  sets       WorkoutSet[]
+}
+
+model WorkoutSet {
+  id         String   @id @default(cuid())
+  exerciseId String
+  exercise   WorkoutExercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  
+  setNumber  Int
+  weight     Float
+  reps       Int
+  breakTime  Int      // Sekunden
+  notes      String?
+}
+
+model Exercise {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  name        String
+  muscleId    String
+  muscle      Muscle  @relation(fields: [muscleId], references: [id])
+  
+}
+
+model TrainingPlan {
+  id        String   @id @default(cuid())
+  userId    String   @default("")  // Optional, falls User spezifische Pläne später
+  name      String
+  
+  exercises TrainingPlanExercise[]
+}
+
+model TrainingPlanExercise {
+  id         String   @id @default(cuid())
+  planId     String
+  plan       TrainingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  
+  order      Int      @default(0)
+  sets       Int?     // Empfohlene Anzahl Sets
+}
+
+model Muscle {
+  id        String   @id @default(cuid())
+  name      String   @unique  // "Beine", "Brust", etc.
+  
+  exercises Exercise[]
+}

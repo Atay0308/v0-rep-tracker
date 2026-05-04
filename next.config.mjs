@@ -2,9 +2,6 @@
 
 import bundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
   typescript: {
     ignoreBuildErrors: true,
   },

@@ -1,0 +1,17 @@
+name: rep-tracker
+
+services: 
+  postgres: 
+    image: postgres:16-alpine
+    container_name: rep-tracker-db
+    restart: always
+    env_file:
+      - .env.local
+    volumes: 
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres:
+

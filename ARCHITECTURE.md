@@ -225,3 +225,10 @@ For JSON server in production, consider:
 - Replace with real database (PostgreSQL, MongoDB)
 - Use Vercel Serverless Functions for API
 - Or deploy separate backend service
+
+
+// To do
+PostgresQL mit Docker
+- nutzen Image-Container von Express und Postgres
+NextAuth mit Google 0Auth (evtl. erweitern um Credentials, sodass mehr als nur Google Login)
+Workouts zu User mappen

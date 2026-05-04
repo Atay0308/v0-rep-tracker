@@ -37,8 +37,10 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-black text-white pb-24">
       {/* Header */}
-      <header className="p-6 border-b border-gray-800">
-        <h1 className="text-2xl font-bold">Vergangene Trainingseinheiten</h1>
+      <header className="relative h-16 border-b border-gray-800">
+        <h1 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-semibold">
+          Vergangene Trainingseinheiten
+        </h1>
       </header>
 
       {/* Workouts list */}
