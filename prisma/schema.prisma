@@ -76,6 +76,7 @@ model Workout {
   updatedAt DateTime @updatedAt
   
   exercises WorkoutExercise[]
+  @@map("workouts")
 }
 
 model WorkoutExercise {
@@ -86,10 +87,11 @@ model WorkoutExercise {
   exerciseId String?
   exercise   Exercise? @relation(fields: [exerciseId], references: [id])  // Optional für globale  
   order      Int      @default(0)
-  sets       WorkoutSet[]
+  sets       ExerciseSet[]
+  @@map("workout_exercises")
 }
 
-model WorkoutSet {
+model ExerciseSet {
   id         String   @id @default(cuid())
   exerciseId String
   exercise   WorkoutExercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
@@ -99,6 +101,7 @@ model WorkoutSet {
   reps       Int
   breakTime  Int      // Sekunden
   notes      String?
+  @@map("exercise_sets")
 }
 
 model Exercise {
@@ -109,7 +112,10 @@ model Exercise {
   name        String
   muscleId    String
   muscle      Muscle  @relation(fields: [muscleId], references: [id])
-  
+
+  workouts    WorkoutExercise[]
+  plans       TrainingPlanExercise[]
+  @@map("exercises")
 }
 
 model TrainingPlan {
@@ -118,6 +124,7 @@ model TrainingPlan {
   name      String
   
   exercises TrainingPlanExercise[]
+  @@map("trainingplans")
 }
 
 model TrainingPlanExercise {
@@ -130,6 +137,7 @@ model TrainingPlanExercise {
   
   order      Int      @default(0)
   sets       Int?     // Empfohlene Anzahl Sets
+  @@map("trainingplan_exercises")
 }
 
 model Muscle {
@@ -137,4 +145,5 @@ model Muscle {
   name      String   @unique  // "Beine", "Brust", etc.
   
   exercises Exercise[]
+  @@map("muscles")
 }

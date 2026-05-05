@@ -1,11 +1,25 @@
 /**
- * Core type definitions for the workout tracking application
+ * UI-Types definition
  */
+/**
+ * Represents a complete workout session
+ */
+export interface WorkoutUI {
+  id: string
+  name?: string
+  date: string // ISO date string (start date)
+  startTime: string // HH:mm format
+  endTime?: string // HH:mm format
+  endDate?: string // ISO date string (end date, for multi-day workouts)
+  notes?: string
+  isActive: boolean // true if workout is in progress
+  exercises: WorkoutExerciseUI[]
+}
 
 /**
  * Represents a single set within an exercise
  */
-export interface WorkoutSet {
+export interface ExerciseSetUI {
   id: string
   setNumber: number
   weight: number
@@ -17,56 +31,34 @@ export interface WorkoutSet {
 /**
  * Represents an exercise within a workout
  */
-export interface WorkoutExercise {
+export interface WorkoutExerciseUI {
   id: string
   workoutId: string
   exerciseName: string
   muscleGroup: string
-  sets: WorkoutSet[]
+  sets: ExerciseSetUI[]
   order: number
 }
 
-/**
- * Represents a complete workout session
- */
-export interface Workout {
-  id: string
-  name: string
-  date: string // ISO date string (start date)
-  startTime: string // HH:mm format
-  endTime?: string // HH:mm format
-  endDate?: string // ISO date string (end date, for multi-day workouts)
-  notes?: string
-  isActive: boolean // true if workout is in progress
-  exercises: WorkoutExercise[]
-}
-
-/**
- * Muscle group categories
- */
-export type MuscleGroup = "Bauch" | "Beine" | "Bizeps" | "Brust" | "Nacken" | "Rücken" | "Schultern" | "Trizeps"
-
-/**
- * Exercise definition with muscle group mapping
- */
-export interface Exercise {
-  id: string
-  name: string
-  muscleGroup: MuscleGroup
-}
 
 /**
  * Training plan definition
  */
-export interface TrainingPlan {
+export interface TrainingPlanUI {
   id: string
   name: string
-  muscleGroups: MuscleGroup[]
   exercises: {
     exerciseName: string
     sets: number
   }[]
 }
+
+// -------------------------
+/**
+ * Muscle group categories
+ */
+export type MuscleGroup = "Bauch" | "Beine" | "Bizeps" | "Brust" | "Nacken" | "Rücken" | "Schultern" | "Trizeps"
+
 
 /**
  * Statistics data point for charts
