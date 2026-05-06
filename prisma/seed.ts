@@ -1,6 +1,8 @@
+import "dotenv/config"
 import { prisma } from "./prisma"
 
 async function main() {
+    
   const groups = [
     "Bauch",
     "Beine",
