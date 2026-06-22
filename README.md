@@ -16,50 +16,49 @@ A comprehensive workout tracking application built with Next.js that helps users
 ### Prerequisites
 
 - Node.js 18+ installed
-- npm or yarn package manager
+- pnpm, npm or yarn package manager
 
-### Installation
+### Installation & Local development
 
 1. Clone the repository
 2. Install dependencies:
 
-\`\`\`bash
-npm install
-\`\`\`
+```bash
+pnpm install
+```
 
-3. Start the JSON server (in a separate terminal):
+3. Copy environment variables:
 
-\`\`\`bash
-npm run json-server
-\`\`\`
+```bash
+cp .env.example .env.local
+# then fill in real secrets in .env.local
+```
 
-4. Start the development server:
+4. Run database migrations and seed (Postgres required):
 
-\`\`\`bash
-npm run dev
-\`\`\`
+```bash
+npx prisma migrate dev
+pnpm run seed
+```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Start the development server:
+
+```bash
+pnpm dev
+```
+
+6. Open http://localhost:3000 in your browser
 
 ## Production Build
 
 To build the application for production:
 
-1. Create a production build:
+```bash
+pnpm build
+pnpm start
+```
 
-\`\`\`bash
-npm run build
-\`\`\`
-
-2. Start the production server:
-
-\`\`\`bash
-npm start
-\`\`\`
-
-The application will be available at [http://localhost:3000](http://localhost:3000) in production mode.
-
-**Note:** Make sure the JSON server is running if you're using it for data persistence, or configure your production API endpoint accordingly.
+Make sure `DATABASE_URL` and other production environment variables are set in your hosting environment.
 
 ## Running Tests
 
@@ -75,22 +74,37 @@ npm run test:watch
 
 ## Project Structure
 
-- \`/app\` - Next.js app router pages
-- \`/components\` - Reusable React components
-- \`/lib\` - Utility functions and API clients
-- \`/types\` - TypeScript type definitions
-- \`/hooks\` - Custom React hooks
-- \`db.json\` - JSON server database
+- `/app` - Next.js app router pages
+- `/components` - Reusable React components
+- `/lib` - Utility functions and API clients
+- `/types` - TypeScript type definitions
+- `/hooks` - Custom React hooks
+- `prisma/` - Prisma schema and seed scripts
 
 ## Technologies Used
 
-- **Next.js 15** - React framework with App Router
+- **Next.js 16+** - React framework with App Router
 - **TypeScript** - Type-safe development
 - **Tailwind CSS** - Utility-first styling
 - **SWR** - Data fetching and caching
 - **Recharts** - Data visualization
-- **JSON Server** - Mock REST API
+- **PostgreSQL + Prisma** - Production data store
+- **NextAuth** - Authentication
 - **Jest & React Testing Library** - Testing
+
+## Secrets & Git
+
+- Store secrets in `.env.local` and never commit real secrets.
+- This repo includes `.env.example` with placeholders. Do not copy real secrets into the example file.
+- `.gitignore` includes `.env*` but if you accidentally committed secrets, run:
+
+```bash
+git rm --cached .env.local
+git commit -m "chore: remove local env from repo"
+git push
+```
+
+Rotate any secrets that were exposed.
 
 ## License
 

@@ -6,7 +6,7 @@ import {
   deleteWorkout,
   getActiveWorkout,
   getRecentWorkouts,
-} from "@/lib/workout-api"
+} from "@/app/actions/workout-actions"
 import type { Workout } from "@/types/workout"
 
 // Mock localStorage

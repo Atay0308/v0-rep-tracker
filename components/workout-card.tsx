@@ -7,12 +7,12 @@
  */
 
 import Link from "next/link"
-import type { Workout } from "@/types/workout"
+import type { WorkoutUI } from "@/types/workout"
 import { formatDateShort, calculateDuration } from "@/lib/date-utils"
 
 interface WorkoutCardProps {
   /** The workout data to display */
-  workout: Workout
+  workout: WorkoutUI
 }
 
 export function WorkoutCard({ workout }: WorkoutCardProps) {
@@ -44,7 +44,7 @@ export function WorkoutCard({ workout }: WorkoutCardProps) {
           {duration > 0 && <span className="text-white/80 text-sm flex-shrink-0 ml-2">({duration} Min)</span>}
         </div>
 
-        <div className="text-white/90 text-sm mb-2">{formatDateShort(new Date(workout.date))}</div>
+        <div className="text-white/90 text-sm mb-2">{formatDateShort(new Date(workout.startDate))}</div>
 
         <div className="space-y-1 flex-1 overflow-hidden">
           {exerciseSummary.slice(0, 4).map((exercise, index) => (

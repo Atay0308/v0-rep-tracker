@@ -4,8 +4,6 @@ import { useState } from "react";
 import styles from "./side-bar.module.css";
 import { useSwipe } from "@/hooks/use-swipe";
 import UserMenu from "../UserMenu/user-menu";
-import { SessionProvider } from "next-auth/react"
-
 export default function Sidebar() {
   // steuert ob Sidebar offen ist oder nicht
   const [open, setOpen] = useState(false);
@@ -27,7 +25,7 @@ export default function Sidebar() {
         />
       )}
 
-      {/* 📦 Sidebar Container - aside wie div, aber semantisch für sidebar */}
+      {/* 📦 Sidebar Container, aside wie div, aber semantisch für sidebar */}
       <aside    
         className={`${styles.sidebar} ${open ? styles.open : ""}`}
 
@@ -37,9 +35,7 @@ export default function Sidebar() {
       >
         {/* 🔝 Oberer Bereich */}
         <div className={styles.top}>
-          <SessionProvider>
-            <UserMenu />
-          </SessionProvider>
+          <UserMenu />
         </div>
 
         {/* 🔻 Unterer Bereich */}

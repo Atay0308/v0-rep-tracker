@@ -1,59 +1,70 @@
+/**
+ * @file app/workout/new/page.tsx
+ * @description Erstellt ein neues Training und leitet zur Detailseite weiter.
+ *
+ * Phase 3: Klare Fehleranzeige statt generischem Alert; Ladezustand über WorkoutLoadingScreen.
+ */
+
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { createWorkout } from "@/lib/workout-api"
-
+import { createWorkout } from "@/app/actions/workout-actions"
+import { formatWorkoutError } from "@/lib/format-workout-error"
+import { WorkoutLoadingScreen, WorkoutErrorPanel } from "@/components/workout/workout-page-state"
+/**
+ * description: Displays a loading screen while creating a new workout, then redirects to the workout detail page.
+ */
 export default function NewWorkoutPage() {
   const router = useRouter()
   const hasCreated = useRef(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (hasCreated.current) {
-      return
-    }
+    if (hasCreated.current) return
 
     const initWorkout = async () => {
       try {
-        console.log("[v0] Creating new workout...")
         hasCreated.current = true
         const now = new Date()
         const workout = await createWorkout({
           name: "",
-          date: now.toISOString().split("T")[0],
-          endDate: undefined,
+          startDate: now.toISOString().split("T")[0],
           startTime: `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}`,
+          endDate: undefined,
           endTime: undefined,
           notes: "",
           isActive: true,
           exercises: [],
         })
 
-        console.log("[v0] Workout created:", workout)
-
         if (!workout.id) {
-          throw new Error("Workout ID is missing")
+          throw new Error("Workout-ID fehlt nach dem Erstellen")
         }
 
-        console.log("[v0] Navigating to workout:", workout.id)
         router.replace(`/workout/${workout.id}`)
-      } catch (error) {
-        console.error("[v0] Failed to create workout:", error)
+      } catch (err) {
+        console.error("[workout] create failed:", err)
         hasCreated.current = false
-        alert("Fehler beim Erstellen des Trainings. Bitte versuchen Sie es erneut.")
-        router.replace("/")
+        setError(formatWorkoutError(err))
       }
     }
 
     initWorkout()
   }, [router])
 
-  return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-        <p className="text-gray-400">Training wird erstellt...</p>
-      </div>
-    </div>
-  )
+  if (error) {
+    return (
+      <WorkoutErrorPanel
+        message={error}
+        onRetry={() => {
+          setError(null)
+          hasCreated.current = false
+          window.location.reload()
+        }}
+      />
+    )
+  }
+
+  return <WorkoutLoadingScreen message="Training wird erstellt…" />
 }

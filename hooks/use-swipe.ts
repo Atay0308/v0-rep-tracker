@@ -1,5 +1,8 @@
 import { useRef } from "react";
 
+/**
+ * description: A custom hook that provides touch event handlers to detect swipe gestures.
+ */
 export function useSwipe(onSwipeLeft: () => void) {
  // speichert Startposition vom Finger (für Swipe)
   const startX = useRef<number | null>(null);
@@ -20,7 +23,7 @@ export function useSwipe(onSwipeLeft: () => void) {
     // Differenz = wie weit gewischt wurde
     const diff = endX - startX.current;
 
-    // wenn negativ → nach links gewischt
+    // wenn negativ => nach links gewischt
     // (Sidebar schließen)
     if (diff < -50) {
       onSwipeLeft();

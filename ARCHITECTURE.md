@@ -1,234 +1,285 @@
-# Workout Tracker Architecture
+# Workout Tracker — Architecture
 
 ## Overview
 
-The Workout Tracker is a full-stack Next.js application built with the App Router, TypeScript, and Tailwind CSS. It uses a JSON server for data persistence and SWR for client-side data fetching and caching.
+Full-stack Next.js App (App Router, TypeScript, Tailwind CSS) with **PostgreSQL + Prisma** for persistence, **NextAuth** for authentication, and **SWR** for client-side caching. Workout data crosses a strict **DB ↔ UI boundary** via converters and Server Actions.
 
 ## Technology Stack
 
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **Data Fetching**: SWR
-- **Charts**: Recharts
-- **Testing**: Jest + React Testing Library
-- **Backend**: JSON Server (mock REST API)
+| Layer | Technology |
+|--------|------------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript |
+| Styling | Tailwind CSS v4 |
+| Database | PostgreSQL + Prisma 7 |
+| Auth | NextAuth v5 (Google) + `@auth/prisma-adapter` |
+| Data fetching (client) | SWR |
+| Charts | Recharts |
+| Testing | Jest + React Testing Library |
 
-## Architecture Patterns
+> **Removed:** JSON Server and `localStorage` fallbacks for workouts (replaced by Prisma + Server Actions).
 
-### 1. Component Architecture
+---
 
-The application follows a modular component architecture:
+## Data architecture (Phases 1 & 2)
 
-- **Pages** (\`app/\`): Route-based pages using Next.js App Router
-- **Components** (\`components/\`): Reusable UI components
-- **Hooks** (\`hooks/\`): Custom React hooks for shared logic
-- **Lib** (\`lib/\`): Utility functions and API clients
+### Boundary pattern
 
-### 2. Data Flow
+The UI never imports Prisma. All database access runs on the server.
 
-\`\`\`
-User Action → Component → API Call → JSON Server
-                ↓
-            SWR Cache ← API Response
-                ↓
-            Component Re-render
-\`\`\`
+```
+PostgreSQL
+    ↓
+Prisma Client (prisma/prisma.ts)
+    ↓
+lib/db/workout-repository.ts     ← queries + nested sync (server-only)
+    ↓
+lib/converters.ts                ← Prisma ↔ WorkoutUI
+    ↓
+app/actions/workout-actions.ts   ← "use server", auth() → userId, Client-Aliase (getWorkouts, …)
+    ↓
+hooks/use-workouts.ts + Pages    ← WorkoutUI only
+```
 
-### 3. State Management
+### UI types (`types/workout.ts`)
 
-- **Server State**: Managed by SWR (workouts, exercises)
-- **Local State**: React useState for UI state
-- **URL State**: Next.js router for navigation state
+| Type | Purpose |
+|------|---------|
+| `WorkoutUI` | Full workout for lists, detail, forms |
+| `WorkoutExerciseUI` | Exercise in a session (`exerciseName`, `muscleGroup` denormalized) |
+| `ExerciseSetUI` | Single set (weight, reps, breakTime, …) |
 
-## Core Features
+**Date/time:** UI uses `startDate` + `startTime` (and optional `endDate` + `endTime`) as strings. Prisma stores `startTime` / `endTime` as `DateTime`.
 
-### 1. Workout Management
+**Rule:** In `"use client"` files, import only from `@/types/workout`, never from `@/generated/prisma`.
 
-**Flow**: Home → New Workout → Select Muscle → Select Exercise → Active Workout
+### Phase 1 — Converters & query shape
 
-- Create new workouts with auto-filled date/time
-- Add exercises from categorized library
-- Track sets with weight, reps, and rest timer
-- Edit and delete sets/exercises
-- Finish workout to mark as complete
+| File | Role |
+|------|------|
+| `lib/db/workout-include.ts` | Shared `WORKOUT_WITH_RELATIONS_INCLUDE` + `WorkoutWithRelations` type |
+| `lib/converters.ts` | `prismaWorkoutToUIWorkout`, `workoutUIToPrismaPatch`, date/time helpers, set field mapping |
 
-**Key Files**:
-- \`app/workout/[id]/page.tsx\` - Active workout interface
-- \`app/workout/[id]/select-muscle/page.tsx\` - Muscle group selection
-- \`app/workout/[id]/select-exercise/page.tsx\` - Exercise selection
-- \`components/exercise-card.tsx\` - Exercise display with sets
-- \`components/set-row.tsx\` - Individual set tracking
+**Why `workout-include.ts`?** Repository and converters must load the same relations (exercises → sets → exercise → muscle) so `exerciseName` / `muscleGroup` are always available in the UI.
 
-### 2. Workout History
+### Phase 2 — Repository, Server Actions, client API
 
-**Flow**: History Page → Workout Detail → Edit
+| File | Role |
+|------|------|
+| `lib/db/exercise-repository.ts` | `findOrCreateExerciseId` — resolves UI names to `Exercise` rows |
+| `lib/db/workout-repository.ts` | CRUD, ownership checks, `syncWorkoutExercises` / `syncExerciseSets` |
+| `app/actions/workout-actions.ts` | Public server API; `requireUserId()` from session |
+| `auth.config.ts` | NextAuth ohne Prisma — **nur** für Middleware (Edge) |
+| `auth.ts` | NextAuth + PrismaAdapter — Server / API routes |
 
-- View all past workouts chronologically
-- Click to view/edit workout details
-- Same interface as active workout
+**Security:** `userId` is never taken from the client payload. Every repository call is scoped with `where: { userId }` or `assertWorkoutOwned`.
 
-**Key Files**:
-- \`app/history/page.tsx\` - Past workouts list
-- \`components/history-workout-card.tsx\` - Workout summary card
+**Nested updates:** When `updateWorkout` receives `exercises`, the repository syncs creates/updates/deletes for workout exercises and sets. Temporary client IDs (e.g. `ex-173…`) are treated as new rows.
 
-### 3. Statistics & Analytics
+### Server Actions (public API)
 
-**Flow**: Statistics Page → Select Tab → Choose Metric → View Chart
+| Action | Description |
+|--------|-------------|
+| `getWorkoutsAction` | All workouts for current user |
+| `getWorkoutAction(id)` | Single workout |
+| `getActiveWorkoutAction` | Active workout or `null` |
+| `getRecentWorkoutsAction(limit)` | Last completed workouts |
+| `createWorkoutAction(input)` | Create; returns existing active if one exists |
+| `updateWorkoutAction(id, patch)` | Partial update + optional full `exercises` |
+| `deleteWorkoutAction(id)` | Delete with ownership check |
 
-Three analysis modes:
-- **General**: Total workouts, training time
-- **Muscles**: Volume per muscle group over time
-- **Exercises**: Max weight progression per exercise
+Client code imports `getWorkouts`, `getWorkout`, … from `app/actions/workout-actions.ts` (aliases without `Action` suffix).
 
-**Key Files**:
-- \`app/statistics/page.tsx\` - Statistics interface
-- \`components/statistics-chart.tsx\` - Chart component
-- \`lib/statistics-utils.ts\` - Data calculation functions
+---
 
-### 4. Training Plans
+## Data flow (current)
 
-**Flow**: Plans Page → Select Plan → (Future: Start Workout)
+```
+User Action (Client Component)
+    ↓
+SWR mutate / await getWorkout() / updateWorkout()
+    ↓  (SWR key null if not authenticated)
+app/actions/workout-actions.ts
+    ↓
+Server Action (runs on server)
+    ↓
+auth() → userId  →  WorkoutActionError if missing
+    ↓
+workout-repository → prisma
+    ↓
+converters → WorkoutUI JSON
+    ↓
+SWR cache update → re-render
+    ↓ on error: formatWorkoutError → WorkoutErrorPanel
+```
 
-- Browse predefined training plans
-- Organized by muscle groups
-- Future: Create custom plans
+---
 
-**Key Files**:
-- \`app/plans/page.tsx\` - Training plans list
+## Prisma schema (workout-related)
 
-## Data Models
+- **Workout** — session header (`startTime`, `endTime`, `isActive`, `userId`)
+- **WorkoutExercise** — link to global **Exercise**, `order`, nested **ExerciseSet**
+- **Exercise** + **Muscle** — canonical names (seeded muscle groups)
 
-### Workout
+---
 
-\`\`\`typescript
-interface Workout {
-  id: string
-  name: string
-  date: string // ISO date
-  startTime: string // HH:mm
-  endTime?: string // HH:mm
-  notes?: string
-  isActive: boolean
-  exercises: WorkoutExercise[]
-}
-\`\`\`
+## UI models (DTOs), Mapper, and IDs
 
-### WorkoutExercise
+### Begriffe
 
-\`\`\`typescript
-interface WorkoutExercise {
-  id: string
-  workoutId: string
-  exerciseName: string
-  muscleGroup: string
-  order: number
-  sets: WorkoutSet[]
-}
-\`\`\`
+| Begriff | Bei uns | Datei |
+|---------|---------|--------|
+| **DTO / UI-Modell** | `WorkoutUI`, `WorkoutExerciseUI`, `ExerciseSetUI` | `types/workout.ts` |
+| **DB-Entity** | Prisma `Workout`, `WorkoutExercise`, `ExerciseSet`, … | `prisma/schema.prisma` |
+| **Mapper** | `prismaWorkoutToUIWorkout`, `workoutUIToPrismaPatch`, … | `lib/converters.ts` |
 
-### WorkoutSet
+Alle UI-Typen haben ein Feld **`id: string`** — die UI arbeitet immer mit IDs, egal ob aus der DB oder temporär.
 
-\`\`\`typescript
-interface WorkoutSet {
-  id: string
-  setNumber: number
-  weight: number
-  reps: number
-  breakTime: number // seconds
-  notes?: string
-}
-\`\`\`
+### Woher kommen IDs?
 
-## API Layer
+| Entität | Nach Laden / Speichern (DB) | Neu in der UI (noch nicht in DB) |
+|---------|-----------------------------|----------------------------------|
+| **Workout** | Prisma `@default(cuid())` → `WorkoutUI.id` | Nur nach `createWorkout`; dann echte ID |
+| **WorkoutExercise** (Zeile im Training) | `WorkoutExercise.id` aus DB → Converter | Client: `ex-${Date.now()}` (`select-exercise`) |
+| **ExerciseSet** | `ExerciseSet.id` aus DB → Converter | Client: `set-${Date.now()}` (`handleAddSet`) |
+| **Exercise** (Übungskatalog) | Eigene DB-ID; UI sieht nur `exerciseName` + `muscleGroup` | Server: `findOrCreateExerciseId` beim Speichern |
 
-### REST Endpoints (JSON Server)
+**Regel:** Temporäre IDs (`ex-…`, `set-…`) sind nur für React (`key`, `map`, lokales State). Beim Speichern erkennt das Repository sie an: ID **nicht** in `existingIds` → **create** (neue CUID). ID **in** DB → **update**.
 
-- \`GET /workouts\` - Fetch all workouts
-- \`GET /workouts/:id\` - Fetch single workout
-- \`POST /workouts\` - Create workout
-- \`PATCH /workouts/:id\` - Update workout
-- \`DELETE /workouts/:id\` - Delete workout
+Nach `updateWorkout` + `workoutMutate()` kommen echte DB-IDs zurück in SWR/`localWorkout`.
 
-### API Client (\`lib/workout-api.ts\`)
+### Lokales Bearbeiten (ohne sofortigen DB-Call)
 
-Provides typed functions for all API operations:
-- \`getWorkouts()\`
-- \`getWorkout(id)\`
-- \`createWorkout(workout)\`
-- \`updateWorkout(id, updates)\`
-- \`deleteWorkout(id)\`
-- \`getActiveWorkout()\`
-- \`getRecentWorkouts(limit)\`
+Auf `workout/[id]/page.tsx`:
 
-## Performance Optimizations
+1. SWR liefert `WorkoutUI` → kopiert in `localWorkout`.
+2. `handleUpdateSet(exerciseId, setId, updatedSet)` sucht in `localWorkout.exercises`:
+   - `ex.id === exerciseId` (Übung in der Liste)
+   - `s.id === setId` (Satz in dieser Übung)
+3. `ExerciseCard` übergibt `exercise.id` und `set.id` aus dem **aktuellen UI-Objekt** (Closure in `.map`).
 
-1. **SWR Caching**: Automatic request deduplication and caching
-2. **Optimistic Updates**: Immediate UI updates before server confirmation
-3. **Code Splitting**: Automatic route-based code splitting
-4. **Lazy Loading**: Components loaded on demand
+Es werden **keine** separaten „DB-IDs“ und „UI-IDs“ geführt — ein `id`-Feld, zwei mögliche Quellen.
 
-## Responsive Design
+### Wann wird was persistiert?
 
-- **Mobile-first**: Designed for mobile, enhanced for desktop
-- **Breakpoints**: Uses Tailwind's responsive prefixes
-- **Touch-friendly**: Large tap targets, swipe gestures
-- **Safe areas**: Respects device safe areas (notches, etc.)
+| Aktion | Wann DB? |
+|--------|----------|
+| Gewicht/Reps ändern | Erst bei „Speichern“ / „Training beenden“ (`updateWorkout` + `exercises`) |
+| Satz hinzufügen | Lokal sofort; DB beim Speichern |
+| Übung aus Liste wählen | Sofort `updateWorkout` (mit temporärer `ex-`/`set-` ID) |
 
-## Testing Strategy
+---
 
-### Unit Tests
-- Utility functions (\`lib/\`)
-- Data calculations
-- Date formatting
+## Component architecture
 
-### Component Tests
-- Component rendering
-- User interactions
-- Props handling
+- **Pages** (`app/`) — routes; workout pages are client components using SWR
+- **Components** (`components/`) — presentational; props use `WorkoutUI` / `ExerciseSetUI`
+- **Hooks** (`hooks/`) — `use-workouts.ts` wraps SWR + Server Actions
+- **Lib** (`lib/`) — converters, statistics, date utils; **db/** for server repositories
 
-### Integration Tests
-- Page flows
-- API interactions
-- State management
+### Core flows
 
-## Future Enhancements
+1. **Home** — `useActiveWorkout`, `useRecentWorkouts` → `WorkoutCard`
+2. **New workout** — `createWorkout` → redirect to `/workout/[id]`
+3. **Active workout** — local state + `updateWorkout` on save/finish
+4. **Add exercise** — select muscle → select exercise → `updateWorkout` with extended `exercises`
+5. **History / Statistics** — `useWorkouts` + `WorkoutUI` utils
 
-1. **Authentication**: User accounts and data sync
-2. **Cloud Storage**: Replace JSON server with real database
-3. **Social Features**: Share workouts, follow friends
-4. **Advanced Analytics**: ML-based insights and recommendations
-5. **Offline Support**: PWA with offline capabilities
-6. **Exercise Videos**: Instructional content
-7. **Custom Plans**: User-created training programs
+---
 
-## Development Guidelines
+## State management
 
-1. **Type Safety**: Use TypeScript strictly, avoid \`any\`
-2. **Component Modularity**: Keep components small and focused
-3. **Documentation**: JSDoc comments for all public APIs
-4. **Testing**: Write tests for new features
-5. **Accessibility**: Semantic HTML, ARIA labels, keyboard navigation
-6. **Performance**: Monitor bundle size, optimize images
-7. **Code Style**: Follow existing patterns, use Prettier
+| Kind | Tool |
+|------|------|
+| Server state | SWR + Server Actions |
+| Form / draft state | `useState` on workout detail page |
+| Auth session | NextAuth (`useSession` where needed) |
+| URL | Next.js router |
+
+---
+
+## Performance
+
+- SWR deduplication and cache keys (`workouts`, `active-workout`, `recent-workouts-N`)
+- Server Actions avoid shipping Prisma to the client bundle
+- Route-based code splitting (App Router)
+
+---
+
+## Testing strategy
+
+- Unit: `lib/converters.ts`, `lib/statistics-utils.ts`, date utils
+- Component: cards, set row (use `WorkoutUI` mocks)
+- Integration: workout flow via Server Actions (mock `auth` / repository in Phase 4)
+
+---
+
+## Migration roadmap
+
+| Phase | Status | Scope |
+|-------|--------|--------|
+| **1** | Done | UI types, `workout-include`, converters |
+| **2** | Done | Repository, Server Actions, hooks, auth session `id` |
+| **3** | Done | Auth middleware, session providers, loading/error UI, page polish |
+| **4** | Planned | Tests + ARCHITECTURE-aligned mocks |
+
+### Phase 3 — UX, Auth & resilience
+
+| File | Role |
+|------|------|
+| `middleware.ts` | Redirect ohne Session von `/workout/*`, `/history`, `/statistics` → `/?authRequired=1` |
+| `components/providers/app-providers.tsx` | `SessionProvider` im Root-Layout (für alle Hooks) |
+| `hooks/use-workout-session.ts` | Session-Status + `useWorkoutSwrKey` (SWR nur wenn eingeloggt) |
+| `lib/errors/workout-action-error.ts` | Strukturierte Fehlercodes (`UNAUTHORIZED`, `NOT_FOUND`, …) |
+| `lib/format-workout-error.ts` | Deutsche UI-Meldungen aus Action-Fehlern |
+| `components/workout/workout-page-state.tsx` | `WorkoutLoadingScreen`, `WorkoutErrorPanel`, `WorkoutNotFoundPanel`, `WorkoutAuthPrompt` |
+
+**Verhalten**
+
+- Nicht eingeloggt: Home zeigt `WorkoutAuthPrompt` statt Start-Button; SWR fetcht nicht (`key: null`).
+- Geschützte URLs ohne Login: Middleware → Home mit Banner.
+- Workout-Detail: getrennte Zustände Laden / Fehler / 404 / Formular.
+- Statistics: kein `setState` während Render für Standard-Übung (`useEffect`).
+
+### Future enhancements
+
+- Server Components for read-heavy pages (home/history) where useful
+- Training plans wired to Prisma
+- PWA / offline
+- Stricter validation (Zod) on action inputs
+
+---
+
+## Development guidelines
+
+1. **Type safety** — `WorkoutUI` on client; Prisma types only under `lib/db/` and `converters.ts`
+2. **No Prisma in client** — use Server Actions or Server Components
+3. **Documentation** — file-level `@description` on new modules; explain *why* not only *what*
+4. **Ownership** — always filter by `userId` from session in repository
+5. **Accessibility** — semantic HTML, ARIA on interactive controls
+
+---
 
 ## Deployment
 
-The application can be deployed to Vercel with zero configuration:
+1. Set `DATABASE_URL` (PostgreSQL)
+2. Run `npx prisma migrate deploy` and `npm run seed` (muscles)
+3. Configure Google OAuth for NextAuth
+4. Deploy to Vercel (or similar); no separate JSON Server process required
 
-1. Connect GitHub repository
-2. Vercel auto-detects Next.js
-3. Environment variables (if needed)
-4. Deploy
+---
 
-For JSON server in production, consider:
-- Replace with real database (PostgreSQL, MongoDB)
-- Use Vercel Serverless Functions for API
-- Or deploy separate backend service
+## Secrets & Git
 
+- Store secrets in environment files (e.g. `.env.local`) and never commit them.
+- This repository includes an `.env.example` that shows required variables (do not put real secrets there).
+- Ensure `.gitignore` contains `/.env*` so `.env.local` and other env files are ignored.
+- If a secret file was accidentally committed, remove it from the repository with:
 
-// To do
-PostgresQL mit Docker
-- nutzen Image-Container von Express und Postgres
-NextAuth mit Google 0Auth (evtl. erweitern um Credentials, sodass mehr als nur Google Login)
-Workouts zu User mappen
+```bash
+git rm --cached .env.local
+git commit -m "chore: remove local env from repo"
+git push
+```
+
+Also consider rotating any secrets that were exposed.

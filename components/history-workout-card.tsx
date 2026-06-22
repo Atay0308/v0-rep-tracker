@@ -3,13 +3,16 @@
  */
 
 import Link from "next/link"
-import type { Workout } from "@/types/workout"
+import type { WorkoutUI } from "@/types/workout"
 import { formatDateShort, calculateDuration } from "@/lib/date-utils"
 
 interface HistoryWorkoutCardProps {
-  workout: Workout
+  workout: WorkoutUI
 }
 
+/**
+ * description: Displays a workout card for the history page, showing workout name, date, duration and exercises. Links to workout details.
+ */
 export function HistoryWorkoutCard({ workout }: HistoryWorkoutCardProps) {
   const duration = workout.endTime ? calculateDuration(workout.startTime, workout.endTime) : 0
 
@@ -33,7 +36,7 @@ export function HistoryWorkoutCard({ workout }: HistoryWorkoutCardProps) {
   return (
     <div className="mb-6">
       {/* Date header */}
-      <div className="text-gray-400 text-sm mb-2">{formatDateShort(new Date(workout.date))}</div>
+      <div className="text-gray-400 text-sm mb-2">{formatDateShort(new Date(workout.startDate))}</div>
 
       {/* Workout card */}
       <div className="rounded-2xl bg-blue-600 p-4">

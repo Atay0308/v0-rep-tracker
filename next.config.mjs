@@ -8,6 +8,12 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  /** Prisma nur auf dem Server bundlen — nicht für Client/Middleware. */
+  serverExternalPackages: [
+    "@prisma/client",
+    "@prisma/adapter-pg",
+    "@prisma/extension-accelerate",
+  ],
 }
 
 const withBundleAnalyzer = bundleAnalyzer({

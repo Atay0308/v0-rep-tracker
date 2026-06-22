@@ -30,9 +30,9 @@ export default function SelectMusclePage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
+      <header className="flex items-center justify-between p-4 border-b border-border">
         <button onClick={() => router.back()} className="text-blue-500 hover:text-blue-400">
           <ArrowLeft className="w-6 h-6" />
         </button>
@@ -42,17 +42,21 @@ export default function SelectMusclePage({ params }: { params: Promise<{ id: str
         </button>
       </header>
 
-      {/* Muscle groups grid */}
-      <div className="grid grid-cols-2 gap-4 p-4">
+      {/* Muscle groups grid — kompakte Kacheln statt großer Quadrate */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 max-w-lg mx-auto">
         {MUSCLE_GROUPS.map((muscle) => (
           <button
             key={muscle}
             onClick={() => handleMuscleSelect(muscle)}
-            className="relative aspect-square rounded-2xl overflow-hidden group"
+            className="relative h-24 rounded-xl overflow-hidden group border border-border bg-card"
           >
-            <img src={muscleImages[muscle] || "/placeholder.svg"} alt={muscle} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-4">
-              <span className="text-white text-lg font-semibold">{muscle}</span>
+            <img
+              src={muscleImages[muscle] || "/placeholder.svg"}
+              alt={muscle}
+              className="w-full h-full object-cover object-center scale-105 group-hover:scale-110 transition-transform"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent flex items-end justify-center pb-2">
+              <span className="text-foreground text-sm font-semibold">{muscle}</span>
             </div>
           </button>
         ))}

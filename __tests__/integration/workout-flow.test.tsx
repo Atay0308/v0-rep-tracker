@@ -1,4 +1,4 @@
-import { createWorkout, updateWorkout, getWorkout } from "@/lib/workout-api"
+import { createWorkout, updateWorkout, getWorkout } from "@/app/actions/workout-actions"
 import type { Workout } from "@/types/workout"
 
 // Mock localStorage

@@ -10,7 +10,9 @@ interface TimerButtonProps {
   onComplete?: () => void
   onTimeChange?: (time: number) => void
 }
-
+/**
+ * description: A timer button that starts counting when clicked. 
+ */
 export function TimerButton({ initialTime = 0, onComplete, onTimeChange }: TimerButtonProps) {
   const [time, setTime] = useState(initialTime)
   const [isRunning, setIsRunning] = useState(false)

@@ -18,13 +18,16 @@
 import { useState } from "react"
 import { MoreVertical, Trash2 } from "lucide-react"
 import { SetRow } from "./set-row"
-import type { WorkoutExercise, WorkoutSet } from "@/types/workout"
+import type { WorkoutExerciseUI, ExerciseSetUI } from "@/types/workout"
 
 interface ExerciseCardProps {
   /** The exercise data including all sets */
-  exercise: WorkoutExercise
-  /** Callback when a set is updated */
-  onUpdateSet: (setId: string, set: WorkoutSet) => void
+  exercise: WorkoutExerciseUI
+  /**
+   * Callback when a set is updated.
+   * `setId` = `set.id` aus `exercise.sets` (wird in der `.map`-Schleife unten übergeben).
+   */
+  onUpdateSet: (setId: string, set: ExerciseSetUI) => void
   /** Callback when a set is deleted */
   onDeleteSet: (setId: string) => void
   /** Callback when adding a new set */

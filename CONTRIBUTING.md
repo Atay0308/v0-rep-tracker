@@ -41,11 +41,14 @@ workout-tracker/
 │   ├── set-row.tsx
 │   ├── timer-button.tsx
 │   └── workout-card.tsx
-├── lib/                   # Utility functions and API
+├── app/actions/           # Server Actions (Workout-API)
+│   └── workout-actions.ts
+├── lib/                   # Utilities, converters, DB layer
 │   ├── date-utils.ts
 │   ├── exercises-data.ts
 │   ├── statistics-utils.ts
-│   └── workout-api.ts
+│   ├── converters.ts
+│   └── db/
 ├── types/                 # TypeScript type definitions
 │   └── workout.ts
 ├── hooks/                 # Custom React hooks

@@ -1,5 +1,5 @@
 /**
- * Training plans page - displays predefined workout plans
+ * description: Displays a list of predefined training plans (currently no functionality, just a static list).
  */
 
 "use client"
@@ -21,7 +21,7 @@ export default function PlansPage() {
   const router = useRouter()
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
+    <div className="min-h-screen bg-background text-foreground pb-24">
       {/* Header */}
       <header className="relative flex items-center justify-between p-4 border-b border-gray-800">
         <h1 className="absolute left-1/2 -translate-x-1/2 text-xl font-semibold">

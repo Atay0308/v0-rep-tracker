@@ -5,7 +5,7 @@
  * Handles time period filtering, data grouping, and metric calculations.
  */
 
-import type { Workout, StatDataPoint, TimePeriod, GroupBy, MuscleGroup } from "@/types/workout"
+import type { WorkoutUI, StatDataPoint, TimePeriod, GroupBy, MuscleGroup } from "@/types/workout"
 import { startOfWeek, startOfMonth, format, subMonths, isAfter } from "date-fns"
 import { calculateDuration } from "@/lib/date-utils" 
 
@@ -24,7 +24,7 @@ import { calculateDuration } from "@/lib/date-utils"
  * // Returns workouts from the last 6 months
  * ```
  */
-export function filterWorkoutsByPeriod(workouts: Workout[], period: TimePeriod): Workout[] {
+export function filterWorkoutsByPeriod(workouts: WorkoutUI[], period: TimePeriod): WorkoutUI[] {
   const now = new Date()
   let cutoffDate: Date
 
@@ -47,7 +47,7 @@ export function filterWorkoutsByPeriod(workouts: Workout[], period: TimePeriod):
       return workouts
   }
 
-  return workouts.filter((w) => isAfter(new Date(w.date), cutoffDate))
+  return workouts.filter((w) => isAfter(new Date(w.startDate), cutoffDate))
 }
 
 /**
@@ -68,7 +68,7 @@ export function filterWorkoutsByPeriod(workouts: Workout[], period: TimePeriod):
  * ```
  */
 export function calculateMuscleGroupVolume(
-  workouts: Workout[],
+  workouts: WorkoutUI[],
   muscleGroup: MuscleGroup | "",
   groupBy: GroupBy,
 ): StatDataPoint[] {
@@ -79,7 +79,7 @@ export function calculateMuscleGroupVolume(
   const grouped = new Map<string, number>()
 
   filtered.forEach((workout) => {
-    const date = new Date(workout.date)
+    const date = new Date(workout.startDate)
     let key: string
 
     // Determine grouping key based on groupBy parameter
@@ -130,7 +130,7 @@ export function calculateMuscleGroupVolume(
  * ```
  */
 export function calculateExerciseMaxWeight(
-  workouts: Workout[],
+  workouts: WorkoutUI[],
   exerciseName: string,
   groupBy: GroupBy,
 ): StatDataPoint[] {
@@ -141,7 +141,7 @@ export function calculateExerciseMaxWeight(
   const grouped = new Map<string, number>()
 
   filtered.forEach((workout) => {
-    const date = new Date(workout.date)
+    const date = new Date(workout.startDate)
     let key: string
 
     // Determine grouping key
@@ -191,7 +191,7 @@ export function calculateExerciseMaxWeight(
  * // Returns: ["Bankdrücken", "Kniebeuge", "Kreuzheben", ...]
  * ```
  */
-export function getUniqueExercises(workouts: Workout[]): string[] {
+export function getUniqueExercises(workouts: WorkoutUI[]): string[] {
   const exercises = new Set<string>()
   workouts.forEach((workout) => {
     workout.exercises.forEach((ex) => {
@@ -215,7 +215,7 @@ export function getUniqueExercises(workouts: Workout[]): string[] {
  * // Returns: 42
  * ```
  */
-export function calculateTotalWorkouts(workouts: Workout[]): number {
+export function calculateTotalWorkouts(workouts: WorkoutUI[]): number {
   return workouts.filter((w) => !w.isActive).length
 }
 
@@ -235,15 +235,11 @@ export function calculateTotalWorkouts(workouts: Workout[]): number {
  * // Returns total training time in minutes
  * ```
  */
-export function calculateTotalTrainingTime(workouts: Workout[]): number {
+export function calculateTotalTrainingTime(workouts: WorkoutUI[]): number {
   return workouts
     .filter((w) => !w.isActive && w.endTime)
     .reduce((total, w) => {
-      // Parse start and end times
-      const [startHour, startMin] = w.startTime.split(":").map(Number)
-      const [endHour, endMin] = w.endTime!.split(":").map(Number)
-      // Calculate duration in minutes
-      const duration = calculateDuration(w.startTime, w.endTime!, w.date, w.endDate)
+      const duration = calculateDuration(w.startTime, w.endTime!, w.startDate, w.endDate)
       return total + duration
     }, 0)
 }

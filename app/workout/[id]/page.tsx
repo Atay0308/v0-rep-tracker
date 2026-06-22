@@ -6,26 +6,65 @@ import { ArrowLeft, MoreVertical, Trash2 } from "lucide-react"
 import useSWR from "swr"
 import { useSWRConfig } from "swr"
 import { ExerciseCard } from "@/components/exercise-card"
-import { getWorkout, updateWorkout, deleteWorkout } from "@/lib/workout-api"
+import { getWorkout, updateWorkout, deleteWorkout } from "@/app/actions/workout-actions"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type { Workout, WorkoutSet } from "@/types/workout"
+import type { WorkoutUI, ExerciseSetUI } from "@/types/workout"
 import { use } from "react"
+import { formatWorkoutError } from "@/lib/format-workout-error"
+import {
+  WorkoutLoadingScreen,
+  WorkoutErrorPanel,
+  WorkoutNotFoundPanel,
+} from "@/components/workout/workout-page-state"
 
+/** Behält lokale Satz-Eingaben, übernimmt neue Übungen vom Server (nach select-exercise). */
+function mergeExercisesFromServer(local: WorkoutUI, server: WorkoutUI): WorkoutUI {
+  const localById = new Map(local.exercises.map((e) => [e.id, e]))
+  const exercises = server.exercises.map((serverEx) => {
+    const localEx = localById.get(serverEx.id)
+    return localEx ? { ...serverEx, sets: localEx.sets } : serverEx
+  })
+  return { ...server, exercises }
+}
+
+/**
+ * Displays the workout details page, allowing users to view and edit their workout. 
+ */
 export default function WorkoutPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const {id : workoutId} = use(params);
   const { mutate } = useSWRConfig()
 
-  const { data: workout, mutate: workoutMutate } = useSWR<Workout>(`workout-${workoutId}`, () => getWorkout(workoutId))
+  const {
+    data: workout,
+    error: workoutError,
+    isLoading: workoutLoading,
+    mutate: workoutMutate,
+  } = useSWR<WorkoutUI | null>(`workout-${workoutId}`, () => getWorkout(workoutId), {
+    revalidateOnMount: true,
+  })
 
-  const [localWorkout, setLocalWorkout] = useState<Workout | null>(null)
+  const [localWorkout, setLocalWorkout] = useState<WorkoutUI | null>(null)
   const [hasChanges, setHasChanges] = useState(false)
 
   useEffect(() => {
-    if (workout && !hasChanges) {
+    void workoutMutate()
+  }, [workoutId, workoutMutate])
+
+  useEffect(() => {
+    if (!workout) return
+    if (!hasChanges) {
       setLocalWorkout(workout)
+      return
     }
-  }, [workout, hasChanges])
+    // Nach „Übung hinzufügen“: Server hat mehr Übungen, lokale Sätze behalten
+    if (
+      localWorkout &&
+      workout.exercises.length > localWorkout.exercises.length
+    ) {
+      setLocalWorkout(mergeExercisesFromServer(localWorkout, workout))
+    }
+  }, [workout, hasChanges, localWorkout])
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -39,7 +78,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     return () => window.removeEventListener("beforeunload", handleBeforeUnload)
   }, [hasChanges])
 
-  const handleUpdateSet = useCallback((exerciseId: string, setId: string, updatedSet: WorkoutSet) => {
+  const handleUpdateSet = useCallback((exerciseId: string, setId: string, updatedSet: ExerciseSetUI) => {
     setLocalWorkout((prev) => {
       if (!prev) return prev
 
@@ -84,7 +123,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
       const updatedExercises = prev.exercises.map((ex) => {
         if (ex.id === exerciseId) {
-          const newSet: WorkoutSet = {
+          const newSet: ExerciseSetUI = {
             id: `set-${Date.now()}`,
             setNumber: ex.sets.length + 1,
             weight: 0,
@@ -121,7 +160,10 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     // Save current state before navigating
     if (hasChanges) {
       try {
-        await updateWorkout(workoutId, localWorkout)
+        const fresh = await getWorkout(workoutId)
+        if (!fresh) return
+        const toSave = mergeExercisesFromServer(localWorkout, fresh)
+        await updateWorkout(workoutId, toSave)
         setHasChanges(false)
         await workoutMutate()
       } catch (error) {
@@ -147,9 +189,9 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
       await mutate("recent-workouts-3")
       await mutate("workouts")
 
-     alert("Training gespeichert!")
+      alert("Training gespeichert!")
     } catch (error) {
-      alert("Fehler beim Speichern")
+      alert(formatWorkoutError(error))
     }
   }
 
@@ -176,7 +218,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
 
       router.push("/")
     } catch (error) {
-      alert("Fehler beim Speichern")
+      alert(formatWorkoutError(error))
     }
   }
 
@@ -193,7 +235,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
       router.replace("/")
     } catch (error) {
       console.error("Failed to delete workout:", error)
-      alert("Fehler beim Löschen des Trainings")
+      alert(formatWorkoutError(error))
     }
   }
 
@@ -207,24 +249,34 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
     }
   }
 
-  if (!localWorkout) {
+  if (workoutLoading) {
+    return <WorkoutLoadingScreen message="Training wird geladen…" />
+  }
+
+  if (workoutError) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-400">Laden...</p>
-        </div>
-      </div>
+      <WorkoutErrorPanel
+        message={formatWorkoutError(workoutError)}
+        onRetry={() => workoutMutate()}
+      />
     )
   }
 
+  if (workout === null) {
+    return <WorkoutNotFoundPanel />
+  }
+
+  if (!localWorkout) {
+    return <WorkoutLoadingScreen />
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
+    <div className="min-h-screen bg-background text-foreground pb-24">
+      <header className="flex items-center justify-between p-4 border-b border-border">
         <button onClick={handleBack} className="text-blue-500 hover:text-blue-400" aria-label="Zurück">
           <ArrowLeft className="w-6 h-6" />
         </button>
-        <h1 className="text-xl font-semibold">{localWorkout.date.split("-").reverse().join(".")}</h1>
+        <h1 className="text-xl font-semibold">{localWorkout.startDate.split("-").reverse().join(".")}</h1>
         <div className="flex gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -265,7 +317,7 @@ export default function WorkoutPage({ params }: { params: Promise<{ id: string }
             <label className="text-gray-400 text-sm mb-1 block">Datum</label>
             <input
               type="text"
-              value={localWorkout.date.split("-").reverse().join(". ")}
+              value={localWorkout.startDate.split("-").reverse().join(". ")}
               readOnly
               className="w-full px-4 py-2 bg-blue-600 text-white rounded-full"
             />

@@ -11,7 +11,7 @@
 
 "use client"
 import dynamic from "next/dynamic"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { NavigationBar } from "@/components/navigation-bar"
 //import { StatisticsChart } from "@/components/statistics-chart"
 import { useWorkouts } from "@/hooks/use-workouts"
@@ -26,11 +26,13 @@ import {
 } from "@/lib/statistics-utils"
 import type { TimePeriod, GroupBy, MuscleGroup } from "@/types/workout"
 import { cn } from "@/lib/utils"
+import { formatWorkoutError } from "@/lib/format-workout-error"
+import { WorkoutLoadingScreen } from "@/components/workout/workout-page-state"
 
 type Tab = "GENERAL" | "MUSCLES" | "EXERCISES"
 
 
-// Lazy load StatisticsChart - Recharts wird erst geladen, wenn Chart gerendert wird
+// Lazy load StatisticsChart. Recharts wird erst geladen, wenn Chart gerendert wird
 const StatisticsChart = dynamic(() => import("@/components/statistics-chart").then(mod => ({ default: mod.StatisticsChart })), {
   ssr: false, // Recharts funktioniert besser ohne SSR
 })
@@ -39,42 +41,55 @@ const StatisticsChart = dynamic(() => import("@/components/statistics-chart").th
  * Statistics page component with tabbed interface for different stat views
  */
 export default function StatisticsPage() {
-  // Fetch all workouts from localStorage
-  const { workouts } = useWorkouts()
+  const { workouts, isLoading, isError, error, mutate } = useWorkouts()
 
-  // State management for filters and selections
   const [activeTab, setActiveTab] = useState<Tab>("GENERAL")
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("6M")
   const [groupBy, setGroupBy] = useState<GroupBy>("Week")
   const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | "">("")
   const [selectedExercise, setSelectedExercise] = useState<string>("")
 
-  // Filter workouts based on selected time period
   const filteredWorkouts = workouts ? filterWorkoutsByPeriod(workouts, timePeriod) : []
-
-  // Get list of all unique exercises from workouts
   const uniqueExercises = workouts ? getUniqueExercises(workouts) : []
 
-  // Set default exercise if not selected
-  if (!selectedExercise && uniqueExercises.length > 0) {
-    setSelectedExercise(uniqueExercises[0])
-  }
+  // Standard-Übung setzen, sobald Daten da sind, nicht während des Renders.
+  useEffect(() => {
+    if (!selectedExercise && uniqueExercises.length > 0) {
+      setSelectedExercise(uniqueExercises[0])
+    }
+  }, [selectedExercise, uniqueExercises])
 
-  // Calculate statistics data based on current selections
   const muscleData = calculateMuscleGroupVolume(filteredWorkouts, selectedMuscle, groupBy)
-  const exerciseData = selectedExercise ? calculateExerciseMaxWeight(filteredWorkouts, selectedExercise, groupBy) : []
+  const exerciseData = selectedExercise
+    ? calculateExerciseMaxWeight(filteredWorkouts, selectedExercise, groupBy)
+    : []
 
-  // Calculate general statistics
   const totalWorkouts = workouts ? calculateTotalWorkouts(workouts) : 0
   const totalTime = workouts ? calculateTotalTrainingTime(workouts) : 0
 
-  // Debug logging for troubleshooting
-  console.log("[v0] Statistics - Muscle data:", muscleData)
-  console.log("[v0] Statistics - Exercise data:", exerciseData)
-  console.log("[v0] Statistics - Filtered workouts:", filteredWorkouts.length)
+  if (isLoading) {
+    return <WorkoutLoadingScreen message="Statistiken werden geladen…" />
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <p className="text-red-400 mb-4">{formatWorkoutError(error)}</p>
+          <button
+            type="button"
+            onClick={() => mutate()}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-full text-white"
+          >
+            Erneut versuchen
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white pb-24">
+    <div className="min-h-screen bg-background text-foreground pb-24">
       {/* Header with page title */}
       <header className="p-6 border-b border-gray-800">
         <h1 className="text-2xl font-bold text-center">Statistics</h1>

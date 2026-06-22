@@ -4,8 +4,8 @@
   "description": "A comprehensive workout tracker to log exercises, track progress, and analyze your fitness journey.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#1a2332",
+  "theme_color": "#1a2332",
   "icons": [
     {
       "src": "/icon.svg",

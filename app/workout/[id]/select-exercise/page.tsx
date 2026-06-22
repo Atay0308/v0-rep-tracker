@@ -1,18 +1,21 @@
 /**
- * Exercise selection page
+ * description: Displays a list of exercises for a selected muscle group, allowing users
+ *              to add them to their workout or create custom exercises.
  */
 
 "use client"
 
 import { useState, use } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useSWRConfig } from "swr"
 import { ArrowLeft, Search, Plus, MoreVertical, X } from "lucide-react"
 import { getExercisesByMuscleGroup, addCustomExercise } from "@/lib/exercises-data"
-import { updateWorkout, getWorkout } from "@/lib/workout-api"
-import type { MuscleGroup, WorkoutExercise } from "@/types/workout"
+import { updateWorkout, getWorkout } from "@/app/actions/workout-actions"
+import type { MuscleGroup, WorkoutExerciseUI } from "@/types/workout"
 
 export default function SelectExercisePage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
+  const { mutate } = useSWRConfig()
   const searchParams = useSearchParams()
   const { id: workoutId } = use(params)
   const muscleGroup = searchParams.get("muscle") as MuscleGroup
@@ -25,11 +28,14 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
 
   const filteredExercises = exercises.filter((ex) => ex.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
-  const handleExerciseSelect = async (exerciseName: string) => {
+  const handleExerciseSelect= async (exerciseName: string) => {
     try {
       const workout = await getWorkout(workoutId)
+      if (!workout) {
+        throw new Error("Workout nicht gefunden")
+      }
 
-      const newExercise: WorkoutExercise = {
+      const newExercise: WorkoutExerciseUI = {
         id: `ex-${Date.now()}`,
         workoutId,
         exerciseName,
@@ -47,10 +53,11 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
         ],
       }
 
-      await updateWorkout(workoutId, {
+      const saved = await updateWorkout(workoutId, {
         exercises: [...workout.exercises, newExercise],
       })
 
+      await mutate(`workout-${workoutId}`, saved, false)
       router.push(`/workout/${workoutId}`)
     } catch (error) {
       console.error("[v0] Failed to add exercise:", error)
@@ -73,9 +80,9 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex items-center justify-between p-4 border-b border-gray-800">
+      <header className="flex items-center justify-between p-4 border-b border-border">
         <button onClick={() => router.back()} className="text-blue-500 hover:text-blue-400">
           <ArrowLeft className="w-6 h-6" />
         </button>
@@ -91,7 +98,7 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
       </header>
 
       {showSearch && (
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-border">
           <input
             type="text"
             value={searchQuery}
@@ -106,7 +113,7 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
       {/* Exercise list */}
       <div className="p-4">
         {filteredExercises.map((exercise) => (
-          <div key={exercise.id} className="flex items-center justify-between p-4 mb-2 bg-gray-900 rounded-lg">
+          <div key={exercise.id} className="flex items-center justify-between p-4 mb-2 bg-card rounded-lg border border-border">
             <button
               onClick={() => handleExerciseSelect(exercise.name)}
               className="flex-1 text-left text-white hover:text-blue-400 transition-colors"
@@ -127,7 +134,7 @@ export default function SelectExercisePage({ params }: { params: Promise<{ id: s
       </div>
 
       {showAddDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 rounded-2xl p-6 w-full max-w-md">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">Neue Übung hinzufügen</h2>

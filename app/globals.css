@@ -76,21 +76,21 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Color tokens for dark theme */
-  --color-background: #000000;
-  --color-foreground: #ffffff;
-  --color-card: #1a1a1a;
-  --color-card-foreground: #ffffff;
+  /* App-Hintergrund: Slate mit leichtem Blaustich — heller als Schwarz, Kontrast zu Blau/Weiß/Grau */
+  --color-background: #1a2332;
+  --color-foreground: #f8fafc;
+  --color-card: #243044;
+  --color-card-foreground: #f8fafc;
   --color-primary: #3b82f6;
   --color-primary-foreground: #ffffff;
-  --color-secondary: #1f2937;
-  --color-secondary-foreground: #ffffff;
-  --color-muted: #374151;
-  --color-muted-foreground: #9ca3af;
+  --color-secondary: #2d3a4f;
+  --color-secondary-foreground: #f8fafc;
+  --color-muted: #334155;
+  --color-muted-foreground: #94a3b8;
   --color-accent: #2563eb;
   --color-accent-foreground: #ffffff;
-  --color-border: #1f2937;
-  --color-input: #1f2937;
+  --color-border: #334155;
+  --color-input: #2d3a4f;
   --color-ring: #3b82f6;
   --color-destructive: oklch(0.577 0.245 27.325);
   --color-destructive-foreground: oklch(0.577 0.245 27.325);

@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import Sidebar from "../components/SideBar/side-bar"
+import { AppProviders } from "@/components/providers/app-providers"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,7 +46,7 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  themeColor: "#000000",
+  themeColor: "#1a2332",
 }
 
 /**
@@ -61,9 +62,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="de" className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <body className="bg-black text-white">
-        <Sidebar />
-        {children}
+      <body className="bg-background text-foreground">
+        <AppProviders>
+          <Sidebar />
+          {children}
+        </AppProviders>
       </body>
     </html>
   )

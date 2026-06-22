@@ -19,13 +19,13 @@
 import { useState } from "react"
 import { MoreVertical, Trash2 } from "lucide-react"
 import { TimerButton } from "./timer-button"
-import type { WorkoutSet } from "@/types/workout"
+import type { ExerciseSetUI } from "@/types/workout"
 
 interface SetRowProps {
   /** The set data to display and edit */
-  set: WorkoutSet
+  set: ExerciseSetUI
   /** Callback when set data changes */
-  onUpdate: (set: WorkoutSet) => void
+  onUpdate: (set: ExerciseSetUI) => void
   /** Callback when set should be deleted */
   onDelete: () => void
 }
